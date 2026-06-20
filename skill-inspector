@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+PYTHONPATH="$(dirname "$0")/src${PYTHONPATH:+:$PYTHONPATH}" exec python -m skill_inspector.cli "$@"
