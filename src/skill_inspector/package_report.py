@@ -33,6 +33,15 @@ class PackageReportGenerator:
         pkg_classes = list(classifications.values())
         type_counts = Counter(pc.type for pc in pkg_classes)
 
+        # Asset distribution totals
+        total_references = sum(pkg.references_count for cat in categories for pkg in cat.packages)
+        total_templates = sum(pkg.templates_count for cat in categories for pkg in cat.packages)
+        total_scripts = sum(pkg.scripts_count for cat in categories for pkg in cat.packages)
+        total_assets_extras = sum(pkg.assets_count for cat in categories for pkg in cat.packages)
+
+        # Category ranking (descending by package count)
+        cat_ranking = sorted(categories, key=lambda c: c.package_count, reverse=True)
+
         # Category breakdown
         cat_breakdown: list[str] = []
         for cat in categories:
@@ -50,7 +59,7 @@ class PackageReportGenerator:
                     lines.append(f"  - {t.value}: {count}")
             cat_breakdown.append("\n".join(lines))
 
-        # Package type distribution
+        # Package type distribution (based ONLY on SKILL.md classification)
         type_dist_lines: list[str] = []
         for t in AssetType:
             count = type_counts.get(t, 0)
@@ -58,19 +67,20 @@ class PackageReportGenerator:
                 pct = count / max(total_packages, 1) * 100
                 type_dist_lines.append(f"- **{t.value}**: {count} ({pct:.0f}%)")
 
-        # Largest packages (by total asset count)
+        # All packages for sorting
         all_packages: list[tuple[Category, PackageClassification | None, SkillPackage]] = []
         for cat in categories:
             for pkg in cat.packages:
                 pc = classifications.get(pkg.id)
                 all_packages.append((cat, pc, pkg))
 
+        # Largest packages by total_asset_count
         largest = sorted(all_packages, key=lambda x: x[2].total_asset_count, reverse=True)[:10]
 
-        # Most complex packages (by number of reference/template/script files)
+        # Most complex packages by complexity_score
         complex_pkgs = sorted(
             all_packages,
-            key=lambda x: len(x[2].assets),
+            key=lambda x: x[2].complexity_score,
             reverse=True,
         )[:10]
 
@@ -91,6 +101,22 @@ class PackageReportGenerator:
         # Governance findings
         findings: list[str] = []
         if total_packages > 0:
+            # Category imbalance: >30% of all packages in one category
+            for cat in categories:
+                ratio = cat.package_count / total_packages
+                if ratio > 0.30:
+                    findings.append(
+                        f"Category concentration detected: `{cat.name}` contains "
+                        f"{cat.package_count}/{total_packages} packages ({ratio:.0%})"
+                    )
+            # Large package warning
+            for cat in categories:
+                for pkg in cat.packages:
+                    if pkg.complexity_score > 20:
+                        findings.append(
+                            f"Large monolithic skill packages detected: `{pkg.id}` "
+                            f"(complexity: {pkg.complexity_score})"
+                        )
             exec_ratio = type_counts.get(AssetType.EXECUTABLE_SKILL, 0) / total_packages
             if exec_ratio < 0.3:
                 findings.append(f"Low executable skill ratio ({exec_ratio:.0%}) — consider reviewing knowledge/reference packages")
@@ -125,9 +151,20 @@ class PackageReportGenerator:
             f"- **Total Assets**: {total_assets}",
             f"- **Duplicate Clusters**: {len(duplicate_clusters)}",
             "",
+            "## Asset Distribution",
+            "",
+            f"- **References**: {total_references}",
+            f"- **Templates**: {total_templates}",
+            f"- **Scripts**: {total_scripts}",
+            f"- **Assets**: {total_assets_extras}",
+            "",
             "## Package Type Distribution",
             "",
         ] + type_dist_lines + [
+            "",
+            "## Top Categories",
+            "",
+        ] + [f"- **{cat.name}**: {cat.package_count} packages" for cat in cat_ranking] + [
             "",
             "## Category Breakdown",
             "",
@@ -135,22 +172,31 @@ class PackageReportGenerator:
             "",
             "## Largest Packages",
             "",
-            "| Rank | Package | Category | Assets |",
-            "|---:|---|---|---:|",
+            "| Rank | Package | Category | References | Templates | Scripts | Assets | Complexity |",
+            "|---:|---|---|---:|---:|---:|---:|---:|",
         ]
         for rank, (cat, pc, pkg) in enumerate(largest, 1):
-            type_str = pc.type.value if pc else "?"
-            lines.append(f"| {rank} | `{pkg.id}` | {cat.name} | {pkg.total_asset_count} |")
+            lines.append(
+                f"| {rank} | `{pkg.id}` | {cat.name} "
+                f"| {pkg.references_count} | {pkg.templates_count} "
+                f"| {pkg.scripts_count} | {pkg.assets_count} "
+                f"| {pkg.complexity_score} |"
+            )
 
         lines += [
             "",
             "## Most Complex Packages",
             "",
-            "| Rank | Package | Category | References |",
-            "|---:|---|---|---:|",
+            "| Rank | Package | Category | Complexity | References | Templates | Scripts | Assets |",
+            "|---:|---|---|---:|---:|---:|---:|---:|",
         ]
         for rank, (cat, pc, pkg) in enumerate(complex_pkgs[:10], 1):
-            lines.append(f"| {rank} | `{pkg.id}` | {cat.name} | {len(pkg.assets)} |")
+            type_str = pc.type.value if pc else "?"
+            lines.append(
+                f"| {rank} | `{pkg.id}` | {cat.name} | {pkg.complexity_score} "
+                f"| {pkg.references_count} | {pkg.templates_count} "
+                f"| {pkg.scripts_count} | {pkg.assets_count} |"
+            )
 
         lines += [
             "",

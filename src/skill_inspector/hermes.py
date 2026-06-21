@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 from .models import Asset, Category, PackageAsset, SkillPackage
 
 
@@ -86,16 +85,14 @@ class HermesAdapter:
         return {str(k): str(v) for k, v in data.items() if not isinstance(v, dict)}
 
 
-    # --- Package-aware discovery (v0.1.5) ---
-
-    # Directly-placed skill folders under skills/ (not categories)
-    ROOT_SKILLS = frozenset({"dogfood", "yuanbao", "software-development"})
+    # --- Package-aware discovery (v0.2.1) ---
 
     def discover_packages(self) -> list[Category]:
         """Discover skill packages organized by category.
 
         Returns a list of Category objects. Each category contains SkillPackages.
-        Handles the exception where some folders are flat skills, not categories.
+        Root-level skill folders (directly under skills/ with SKILL.md) are
+        auto-detected — no hardcoded names.
         """
         if not self.skills_dir.exists():
             raise FileNotFoundError(f"Hermes skills directory not found: {self.skills_dir}")
@@ -109,8 +106,9 @@ class HermesAdapter:
             if entry.name in ("index-cache",):
                 continue
 
-            # Check if this is a root-level skill folder (not a category)
-            if entry.name in self.ROOT_SKILLS:
+            # Check if this is a root-level skill folder (not a category):
+            # A directory is root-level if skills/<folder>/SKILL.md exists directly.
+            if (entry / "SKILL.md").exists():
                 pkg = self._discover_single_package(entry, category_name="root")
                 if pkg:
                     cat = Category(id=str(entry.relative_to(self.skills_dir)),
@@ -159,13 +157,45 @@ class HermesAdapter:
             content=skill_md_content,
         )
 
-        # Collect optional asset files
+        # Collect optional asset files, separated by directory type
+        references: list[PackageAsset] = []
+        templates: list[PackageAsset] = []
+        scripts: list[PackageAsset] = []
         assets: list[PackageAsset] = []
         SKIP_ASSET_FILES = frozenset({"skill.md"})
+
+        for subdir_name, target_list in [
+            ("references", references),
+            ("templates", templates),
+            ("scripts", scripts),
+        ]:
+            subdir = skill_dir / subdir_name
+            if subdir.is_dir():
+                for fpath in sorted(subdir.rglob("*")):
+                    if not fpath.is_file():
+                        continue
+                    if fpath.name.lower() in SKIP_ASSET_FILES:
+                        continue
+                    content = fpath.read_text(encoding="utf-8", errors="replace")
+                    if content.strip():
+                        target_list.append(PackageAsset(
+                            name=fpath.name,
+                            path=fpath,
+                            content=content,
+                        ))
+
+        # Files outside recognized subdirectories go into "assets"
         for fpath in sorted(skill_dir.rglob("*")):
             if not fpath.is_file():
                 continue
             if fpath.name.lower() in SKIP_ASSET_FILES:
+                continue
+            # Skip files already collected in known subdirectories
+            try:
+                rel = fpath.relative_to(skill_dir)
+            except ValueError:
+                continue
+            if rel.parts and rel.parts[0] in ("references", "templates", "scripts", "assets"):
                 continue
             content = fpath.read_text(encoding="utf-8", errors="replace")
             if content.strip():
@@ -181,6 +211,9 @@ class HermesAdapter:
             path=skill_dir,
             category=category_name,
             skill_md=skill_md,
+            references=references,
+            templates=templates,
+            scripts=scripts,
             assets=assets,
         )
 

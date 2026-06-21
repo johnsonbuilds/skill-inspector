@@ -55,11 +55,34 @@ class SkillPackage:
     path: Path
     category: str  # e.g. "creative", "github", or root-level like "dogfood"
     skill_md: PackageAsset  # the required SKILL.md
-    assets: list[PackageAsset]  # all other files
+    references: list[PackageAsset] = field(default_factory=list)
+    templates: list[PackageAsset] = field(default_factory=list)
+    scripts: list[PackageAsset] = field(default_factory=list)
+    assets: list[PackageAsset] = field(default_factory=list)
     total_asset_count: int = field(init=False)
+    references_count: int = field(init=False)
+    templates_count: int = field(init=False)
+    scripts_count: int = field(init=False)
+    assets_count: int = field(init=False)
 
     def __post_init__(self):
-        object.__setattr__(self, "total_asset_count", 1 + len(self.assets))
+        object.__setattr__(self, "references_count", len(self.references))
+        object.__setattr__(self, "templates_count", len(self.templates))
+        object.__setattr__(self, "scripts_count", len(self.scripts))
+        object.__setattr__(self, "assets_count", len(self.assets))
+        object.__setattr__(self, "total_asset_count",
+                             1 + self.references_count + self.templates_count
+                             + self.scripts_count + self.assets_count)
+
+    @property
+    def complexity_score(self) -> int:
+        """Weighted complexity: refs*1 + templates*2 + scripts*3 + assets*1."""
+        return (
+            self.references_count
+            + self.templates_count * 2
+            + self.scripts_count * 3
+            + self.assets_count
+        )
 
 
 @dataclass(frozen=True)
