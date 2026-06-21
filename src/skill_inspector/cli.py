@@ -26,9 +26,7 @@ def scan(args: argparse.Namespace) -> int:
     model_config = adapter.load_model_config()
     assets = adapter.discover_assets()
     classifier = LLMClassifier(model_config)
-    classifications = {}
-    for asset in assets:
-        classifications[asset.id] = classifier.classify(asset)
+    classifications = classifier.classify_batch(assets)
     clusters = DuplicateDetector(EmbeddingClient(model_config), args.duplicate_threshold).detect(assets)
     ReportGenerator().generate(assets, classifications, clusters, Path(args.output))
     counts = Counter(c.type.value for c in classifications.values())

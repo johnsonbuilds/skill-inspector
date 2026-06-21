@@ -36,18 +36,39 @@ class HermesAdapter:
             api_key=self._expand(model.get("api_key")) or None,
         )
 
+    # Files that are metadata/boilerplate, not actual skill content
+    SKIP_FILES = frozenset({
+        "description.md", "readme.md", "license", "license.txt",
+        "port_notes.md", "changelog.md", "contributors.md",
+        ".gitkeep", "description",
+    })
+    # Minimum content length to be considered a meaningful asset
+    MIN_CONTENT_LENGTH = 80
+    # Maximum content length to avoid bloating API payloads
+    MAX_CONTENT_LENGTH = 20000
+
     def discover_assets(self) -> list[Asset]:
         if not self.skills_dir.exists():
             raise FileNotFoundError(f"Hermes skills directory not found: {self.skills_dir}")
         assets: list[Asset] = []
         for path in sorted(self.skills_dir.rglob("*")):
-            if path.is_file() and (path.name.lower() in {"skill.md", "readme.md"} or path.suffix.lower() in {".md", ".txt", ".yaml", ".yml"}):
-                content = path.read_text(encoding="utf-8", errors="replace")
-                if not content.strip():
-                    continue
-                rel = path.relative_to(self.skills_dir)
-                name = path.parent.name if path.name.lower() == "skill.md" else path.stem
-                assets.append(Asset(id=str(rel), name=name, path=path, content=content, metadata=self._metadata(content)))
+            if not path.is_file():
+                continue
+            stem_lower = path.stem.lower()
+            suffix_lower = path.suffix.lower()
+            # Only process SKILL.md files and content-bearing .md/.txt files
+            if stem_lower in self.SKIP_FILES:
+                continue
+            if path.name.lower() != "skill.md" and suffix_lower not in {".md", ".txt", ".yaml", ".yml"}:
+                continue
+            content = path.read_text(encoding="utf-8", errors="replace")
+            if not content.strip() or len(content) < self.MIN_CONTENT_LENGTH:
+                continue
+            if len(content) > self.MAX_CONTENT_LENGTH:
+                continue
+            rel = path.relative_to(self.skills_dir)
+            name = path.parent.name if path.name.lower() == "skill.md" else path.stem
+            assets.append(Asset(id=str(rel), name=name, path=path, content=content, metadata=self._metadata(content)))
         return assets
 
     def _expand(self, value: Any) -> str:

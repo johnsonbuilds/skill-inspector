@@ -14,41 +14,34 @@ from .models import Asset, AssetType, Classification
 
 SYSTEM_PROMPT = """You are an Agent Asset Auditor.
 
-Classify the following asset into exactly one category:
+You will receive N assets. For EACH asset, return a JSON object with its classification.
 
-1. Knowledge
-2. Workflow
-3. Executable Skill
-4. Preference
-5. Reference Material
-6. Unknown
+Classify each asset into exactly one category:
+- Knowledge: Facts, strategies, lessons learned, guidance
+- Workflow: Repeatable process or methodology
+- Executable Skill: Can directly perform a task with clear inputs and outputs
+- Preference: User-specific behavior or style preference
+- Reference Material: External information stored for future use
+- Unknown: Classification confidence is low
 
-Definitions:
+Return your answer as a JSON array of objects, one per asset, in this exact format:
+[
+  {
+    "asset_index": 0,
+    "type": "Knowledge",
+    "confidence": 0.95,
+    "reason": "Brief explanation"
+  },
+  {
+    "asset_index": 1,
+    "type": "Workflow",
+    "confidence": 0.8,
+    "reason": "Brief explanation"
+  }
+]
 
-Knowledge:
-Facts, strategies, lessons learned, guidance.
-
-Workflow:
-Repeatable process or methodology.
-
-Executable Skill:
-Can directly perform a task with clear inputs and outputs.
-
-Preference:
-User-specific behavior or style preference.
-
-Reference Material:
-External information stored for future use.
-
-Unknown:
-Use only when classification confidence is low.
-
-Return JSON only with this schema:
-{
-  "type": "Knowledge | Workflow | Executable Skill | Preference | Reference Material | Unknown",
-  "confidence": 0.0,
-  "reason": "Short explanation for the classification."
-}"""
+The "asset_index" must match the 0-based position of the asset in the input (0 for first, 1 for second, etc.).
+Return ONLY the JSON array, no other text."""
 
 
 class LLMClassifier:
@@ -56,6 +49,70 @@ class LLMClassifier:
         self.config = config
 
     def classify(self, asset: Asset) -> Classification:
+        results = self.classify_batch([asset])
+        return results[asset.id]
+
+    def classify_batch(self, assets: list[Asset]) -> dict[str, Classification]:
+        """Classify multiple assets in a single API call for efficiency."""
+        BATCH_SIZE = 5
+        results: dict[str, Classification] = {}
+        for batch_start in range(0, len(assets), BATCH_SIZE):
+            batch = assets[batch_start:batch_start + BATCH_SIZE]
+            success_count = 0
+            for attempt in range(2):  # retry once on failure
+                if success_count == len(batch):
+                    break
+                entries = []
+                for i, asset in enumerate(batch):
+                    entries.append(f"--- ASSET {i} ---\nName: {asset.name}\nPath: {asset.id}\nContent:\n{asset.content[:6000]}")
+                user_content = "\n\n".join(entries)
+                try:
+                    text = self._chat(user_content)
+                except Exception:
+                    continue
+                # Try to parse as JSON array
+                parsed = []
+                try:
+                    parsed = json.loads(text)
+                except json.JSONDecodeError:
+                    # Try to extract JSON array from response
+                    match = re.search(r"\[.*\]", text, re.S)
+                    if match:
+                        try:
+                            parsed = json.loads(match.group(0))
+                        except json.JSONDecodeError:
+                            pass
+
+                if isinstance(parsed, list):
+                    for item in parsed:
+                        if isinstance(item, dict) and "asset_index" in item:
+                            idx = item["asset_index"]
+                            if 0 <= idx < len(batch):
+                                asset = batch[idx]
+                                asset_type = AssetType(item.get("type", "Unknown")) if item.get("type", "") in {t.value for t in AssetType} else AssetType.UNKNOWN
+                                results[asset.id] = Classification(
+                                    asset_type,
+                                    max(0.0, min(1.0, float(item.get("confidence", 0)))),
+                                    str(item.get("reason", ""))[:500]
+                                )
+                                success_count += 1
+            # For remaining unclassified assets, classify individually with retry
+            for asset in batch:
+                if asset.id not in results:
+                    classified = False
+                    for _attempt in range(2):
+                        try:
+                            results[asset.id] = self._fallback_classify(asset)
+                            classified = True
+                            break
+                        except Exception:
+                            continue
+                    if not classified:
+                        # Last resort: default classification
+                        results[asset.id] = Classification(AssetType.UNKNOWN, 0.0, "Classification failed after retries")
+        return results
+
+    def _fallback_classify(self, asset: Asset) -> Classification:
         prompt = f"Asset name: {asset.name}\nPath: {asset.id}\nContent:\n{asset.content[:12000]}"
         text = self._chat(prompt)
         data = self._json(text)
@@ -72,6 +129,9 @@ class LLMClassifier:
 
     def _openai_compatible(self, prompt: str) -> str:
         base = (self.config.base_url or ("https://openrouter.ai/api/v1" if self.config.provider == "openrouter" else "https://api.openai.com/v1")).rstrip("/")
+        # Ensure base ends with /v1 (OpenAI-compatible convention), not /v1/chat/completions
+        if base.endswith("/chat/completions"):
+            base = base.rsplit("/chat/completions", 1)[0]
         payload = {"model": self.config.model, "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}], "temperature": 0, "response_format": {"type": "json_object"}}
         data = self._post(f"{base}/chat/completions", payload, auth=True)
         return data["choices"][0]["message"]["content"]
@@ -96,6 +156,16 @@ class LLMClassifier:
         req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers=headers, method="POST")
         with urllib.request.urlopen(req, timeout=120) as resp:
             return json.loads(resp.read().decode())
+
+    def _post_safe(self, url: str, payload: dict[str, Any], auth: bool, extra: dict[str, str] | None = None) -> dict[str, Any]:
+        """Same as _post but raises on HTTP errors instead of crashing."""
+        try:
+            return self._post(url, payload, auth, extra)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode() if hasattr(e, 'read') else str(e)
+            raise RuntimeError(f"HTTP {e.code} from {url}: {body[:500]}")
+        except Exception as e:
+            raise RuntimeError(f"Request failed to {url}: {e}")
 
     def _json(self, text: str) -> dict[str, Any]:
         try:
@@ -122,6 +192,11 @@ class EmbeddingClient:
             base = (self.config.base_url or "http://localhost:11434").rstrip("/")
             return [self._ollama_embed(base, t) for t in texts]
         base = (self.config.base_url or ("https://openrouter.ai/api/v1" if self.config.provider == "openrouter" else "https://api.openai.com/v1")).rstrip("/")
+        # Strip trailing path segments if base_url already contains them
+        for suffix in ("/chat/completions", "/embeddings"):
+            if base.endswith(suffix):
+                base = base.rsplit(suffix, 1)[0]
+                break
         model = "text-embedding-3-small" if self.config.provider in {"openai", "openrouter", ""} else self.config.model
         headers = {"Content-Type": "application/json"}
         if self.config.api_key:
