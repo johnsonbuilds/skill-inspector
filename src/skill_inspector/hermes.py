@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 
-from .models import Asset
+from .models import Asset, Category, PackageAsset, SkillPackage
 
 
 @dataclass(frozen=True)
@@ -84,6 +84,105 @@ class HermesAdapter:
             return {}
         data = _simple_yaml(match.group(1))
         return {str(k): str(v) for k, v in data.items() if not isinstance(v, dict)}
+
+
+    # --- Package-aware discovery (v0.1.5) ---
+
+    # Directly-placed skill folders under skills/ (not categories)
+    ROOT_SKILLS = frozenset({"dogfood", "yuanbao", "software-development"})
+
+    def discover_packages(self) -> list[Category]:
+        """Discover skill packages organized by category.
+
+        Returns a list of Category objects. Each category contains SkillPackages.
+        Handles the exception where some folders are flat skills, not categories.
+        """
+        if not self.skills_dir.exists():
+            raise FileNotFoundError(f"Hermes skills directory not found: {self.skills_dir}")
+
+        categories: list[Category] = []
+
+        for entry in sorted(self.skills_dir.iterdir()):
+            if not entry.is_dir():
+                continue
+            # Skip non-category directories
+            if entry.name in ("index-cache",):
+                continue
+
+            # Check if this is a root-level skill folder (not a category)
+            if entry.name in self.ROOT_SKILLS:
+                pkg = self._discover_single_package(entry, category_name="root")
+                if pkg:
+                    cat = Category(id=str(entry.relative_to(self.skills_dir)),
+                                   name=entry.name, description="", packages=[pkg])
+                    categories.append(cat)
+                continue
+
+            # Regular category: read DESCRIPTION.md if present
+            desc_path = entry / "DESCRIPTION.md"
+            description = ""
+            if desc_path.exists():
+                description = desc_path.read_text(encoding="utf-8", errors="replace").strip()
+
+            # Discover skill packages in this category
+            packages: list[SkillPackage] = []
+            for skill_dir in sorted(entry.iterdir()):
+                if not skill_dir.is_dir():
+                    continue
+                pkg = self._discover_single_package(skill_dir, category_name=entry.name)
+                if pkg:
+                    packages.append(pkg)
+
+            if packages:
+                categories.append(Category(
+                    id=str(entry.relative_to(self.skills_dir)),
+                    name=entry.name,
+                    description=description,
+                    packages=packages,
+                ))
+
+        return categories
+
+    def _discover_single_package(self, skill_dir: Path, category_name: str) -> SkillPackage | None:
+        """Discover a single skill package from a directory."""
+        skill_md_path = skill_dir / "SKILL.md"
+        if not skill_md_path.exists():
+            return None
+
+        skill_md_content = skill_md_path.read_text(encoding="utf-8", errors="replace")
+        if not skill_md_content.strip():
+            return None
+
+        skill_md = PackageAsset(
+            name="SKILL.md",
+            path=skill_md_path,
+            content=skill_md_content,
+        )
+
+        # Collect optional asset files
+        assets: list[PackageAsset] = []
+        SKIP_ASSET_FILES = frozenset({"skill.md"})
+        for fpath in sorted(skill_dir.rglob("*")):
+            if not fpath.is_file():
+                continue
+            if fpath.name.lower() in SKIP_ASSET_FILES:
+                continue
+            content = fpath.read_text(encoding="utf-8", errors="replace")
+            if content.strip():
+                assets.append(PackageAsset(
+                    name=fpath.name,
+                    path=fpath,
+                    content=content,
+                ))
+
+        return SkillPackage(
+            id=str(skill_dir.relative_to(self.skills_dir)),
+            name=skill_dir.name,
+            path=skill_dir,
+            category=category_name,
+            skill_md=skill_md,
+            assets=assets,
+        )
 
 
 def _simple_yaml(text: str) -> dict[str, Any]:
