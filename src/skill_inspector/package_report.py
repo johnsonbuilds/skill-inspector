@@ -10,6 +10,9 @@ from .models import (
     PackageDuplicateCluster,
     SkillPackage,
 )
+from .health_scoring import PackageHealthResult, score_package
+from .risk_analysis import RiskAnalysis, detect_risks
+from .recommendations import Recommendation, generate_recommendations
 
 
 class PackageReportGenerator:
@@ -41,6 +44,27 @@ class PackageReportGenerator:
 
         # Category ranking (descending by package count)
         cat_ranking = sorted(categories, key=lambda c: c.package_count, reverse=True)
+
+        # Compute health scores for all packages
+        health_results: dict[str, PackageHealthResult] = {}
+        for cat in categories:
+            for pkg in cat.packages:
+                health_results[pkg.id] = score_package(pkg, classifications.get(pkg.id))
+
+        # Detect risks
+        risk_analysis = detect_risks(categories, classifications)
+
+        # Generate recommendations
+        recommendations = generate_recommendations(
+            categories, classifications, health_results,
+            risk_analysis.risks + risk_analysis.category_concentrations,
+            len(duplicate_clusters),
+        )
+
+        # --- Library-level health score ---
+        library_health = self._compute_library_health(
+            categories, health_results, risk_analysis, type_counts, total_packages,
+        )
 
         # Category breakdown
         cat_breakdown: list[str] = []
@@ -84,6 +108,48 @@ class PackageReportGenerator:
             reverse=True,
         )[:10]
 
+        # Healthiest packages
+        healthiest = sorted(
+            health_results.values(),
+            key=lambda h: h.overall,
+            reverse=True,
+        )[:10]
+
+        # Highest risk packages
+        highest_risk = sorted(
+            health_results.values(),
+            key=lambda h: h.overall,
+        )[:10]
+
+        # Most valuable packages: Executable + Supporting Assets + Complexity - Risk
+        def value_score(hr: PackageHealthResult) -> int:
+            pkg = None
+            for cat in categories:
+                for p in cat.packages:
+                    if p.id == hr.package_id:
+                        pkg = p
+                        break
+                if pkg:
+                    break
+            if not pkg:
+                return 0
+            cls = classifications.get(pkg.id)
+            bonus = 0
+            if cls and cls.type.value == "Executable Skill":
+                bonus += 30
+            elif cls and cls.type.value == "Workflow":
+                bonus += 20
+            bonus += pkg.total_asset_count * 2
+            bonus += min(pkg.complexity_score, 30)
+            risk_penalty = 100 - hr.overall
+            return bonus - risk_penalty
+
+        most_valuable = sorted(
+            health_results.values(),
+            key=value_score,
+            reverse=True,
+        )[:10]
+
         # Duplicate clusters
         dup_lines: list[str] = []
         if duplicate_clusters:
@@ -98,47 +164,10 @@ class PackageReportGenerator:
         else:
             dup_lines.append("No duplicate skill packages detected.")
 
-        # Governance findings
-        findings: list[str] = []
-        if total_packages > 0:
-            # Category imbalance: >30% of all packages in one category
-            for cat in categories:
-                ratio = cat.package_count / total_packages
-                if ratio > 0.30:
-                    findings.append(
-                        f"Category concentration detected: `{cat.name}` contains "
-                        f"{cat.package_count}/{total_packages} packages ({ratio:.0%})"
-                    )
-            # Large package warning
-            for cat in categories:
-                for pkg in cat.packages:
-                    if pkg.complexity_score > 20:
-                        findings.append(
-                            f"Large monolithic skill packages detected: `{pkg.id}` "
-                            f"(complexity: {pkg.complexity_score})"
-                        )
-            exec_ratio = type_counts.get(AssetType.EXECUTABLE_SKILL, 0) / total_packages
-            if exec_ratio < 0.3:
-                findings.append(f"Low executable skill ratio ({exec_ratio:.0%}) — consider reviewing knowledge/reference packages")
-            ref_ratio = type_counts.get(AssetType.REFERENCE, 0) / total_packages
-            if ref_ratio > 0.3:
-                findings.append(f"High reference material ratio ({ref_ratio:.0%}) — consider moving to a separate knowledge base")
-        if duplicate_clusters:
-            findings.append(f"Duplicate or overlapping skill packages detected ({len(duplicate_clusters)} clusters)")
-        if not findings:
-            findings.append("No major governance issues detected")
-
-        # Recommendations
-        recommendations: list[str] = [
-            "Review low-confidence classifications and reclassify packages where needed",
-        ]
-        if duplicate_clusters:
-            recommendations.append("Merge or archive highly overlapping skill packages in duplicate clusters")
-        if any("reference" in f.lower() for f in findings):
-            recommendations.append("Move broad reference material into a separate knowledge base")
-        if any("executable" in f.lower() for f in findings):
-            recommendations.append("Ensure each executable skill has clear inputs, outputs, and actionable procedures")
-        recommendations.append("Periodically audit categories to ensure DESCRIPTION.md files are up to date")
+        # Governance summary
+        governance_summary = self._build_governance_summary(
+            categories, health_results, risk_analysis, type_counts, total_packages,
+        )
 
         # Build report
         lines = [
@@ -150,6 +179,15 @@ class PackageReportGenerator:
             f"- **Total Skill Packages**: {total_packages}",
             f"- **Total Assets**: {total_assets}",
             f"- **Duplicate Clusters**: {len(duplicate_clusters)}",
+            "",
+            "## Library Health Score",
+            "",
+            f"**Overall Health: {library_health['overall']} / 100**",
+            "",
+            f"- **Structure**: {library_health['structure']} / 25",
+            f"- **Maintainability**: {library_health['maintainability']} / 25",
+            f"- **Reusability**: {library_health['reusability']} / 25",
+            f"- **Duplication**: {library_health['duplication']} / 25",
             "",
             "## Asset Distribution",
             "",
@@ -198,20 +236,321 @@ class PackageReportGenerator:
                 f"| {pkg.scripts_count} | {pkg.assets_count} |"
             )
 
+        # Healthiest packages
+        lines += [
+            "",
+            "## Healthiest Packages",
+            "",
+            "| Rank | Package | Category | Health | Archetype |",
+            "|---:|---|---|---:|---|",
+        ]
+        for rank, hr in enumerate(healthiest, 1):
+            lines.append(f"| {rank} | `{hr.package_id}` | {hr.category} | {hr.overall} / 100 | {hr.archetype} |")
+
+        # Highest risk packages
+        lines += [
+            "",
+            "## Highest Risk Packages",
+            "",
+            "| Rank | Package | Category | Health | Complexity | Risk Factors |",
+            "|---:|---|---|---:|---:|---|",
+        ]
+        for rank, hr in enumerate(highest_risk, 1):
+            risk_text = "; ".join(hr.risk_factors) if hr.risk_factors else "-"
+            pkg_obj = next(
+                (p for cat in categories for p in cat.packages if p.id == hr.package_id),
+                None,
+            )
+            complexity = pkg_obj.complexity_score if pkg_obj else "?"
+            lines.append(
+                f"| {rank} | `{hr.package_id}` | {hr.category} "
+                f"| {hr.overall} / 100 | {complexity} | {risk_text} |"
+            )
+
+        # Most valuable packages
+        lines += [
+            "",
+            "## Most Valuable Packages",
+            "",
+            "| Rank | Package | Category | Health | Value Score |",
+            "|---:|---|---|---:|---:|",
+        ]
+        for rank, hr in enumerate(most_valuable, 1):
+            lines.append(
+                f"| {rank} | `{hr.package_id}` | {hr.category} "
+                f"| {hr.overall} / 100 | {value_score(hr)} |"
+            )
+
+        # Risk analysis
+        all_risks = risk_analysis.risks + risk_analysis.category_concentrations
+        if all_risks:
+            lines += [
+                "",
+                "## Risk Analysis",
+                "",
+            ]
+            # Group by type
+            risk_groups: dict[str, list] = {}
+            for r in all_risks:
+                risk_groups.setdefault(r.risk_type, []).append(r)
+
+            if "monolithic" in risk_groups:
+                lines.append("### Monolithic Packages")
+                lines.append("")
+                for r in sorted(risk_groups["monolithic"], key=lambda x: int(x.detail.split(": ")[1] if ": " in x.detail else 0), reverse=True):
+                    lines.append(f"- `{r.package_id}` Severity: {r.severity.value} — {r.detail}")
+                lines.append("")
+
+            if "ref_bloat" in risk_groups:
+                lines.append("### Reference Bloat")
+                lines.append("")
+                for r in risk_groups["ref_bloat"]:
+                    lines.append(f"- `{r.package_id}` {r.detail}")
+                lines.append("")
+
+            if "template_bloat" in risk_groups:
+                lines.append("### Template Bloat")
+                lines.append("")
+                for r in risk_groups["template_bloat"]:
+                    lines.append(f"- `{r.package_id}` {r.detail}")
+                lines.append("")
+
+            if "script_bloat" in risk_groups:
+                lines.append("### Script Bloat")
+                lines.append("")
+                for r in risk_groups["script_bloat"]:
+                    lines.append(f"- `{r.package_id}` {r.detail}")
+                lines.append("")
+
+            if "category_concentration" in risk_groups:
+                lines.append("### Category Concentration")
+                lines.append("")
+                for r in risk_groups["category_concentration"]:
+                    lines.append(f"- `{r.package_id}` {r.detail}")
+                lines.append("")
+
+        # Governance recommendations
+        if recommendations:
+            lines += [
+                "",
+                "## Governance Recommendations",
+                "",
+            ]
+            # Sort by severity
+            sev_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+            sorted_recs = sorted(recommendations, key=lambda r: sev_order.get(r.severity, 99))
+            for rec in sorted_recs:
+                scope = rec.package_id if rec.package_id else "[library-wide]"
+                lines.append(f"### {rec.title}")
+                lines.append(f"- **Scope**: `{scope}`")
+                lines.append(f"- **Severity**: {rec.severity}")
+                lines.append(f"- **Description**: {rec.description}")
+                lines.append(f"- **Action**: {rec.action}")
+                lines.append("")
+
         lines += [
             "",
             "## Duplicate Skill Packages",
             "",
         ] + dup_lines + [
             "",
-            "## Governance Findings",
+            "## Governance Summary",
             "",
-        ] + [f"- {f}" for f in findings] + [
-            "",
-            "## Recommendations",
-            "",
-        ] + [f"- {r}" for r in recommendations]
+        ] + governance_summary
 
         text = "\n".join(lines) + "\n"
         output.write_text(text, encoding="utf-8")
         return text
+
+    def _compute_library_health(
+        self,
+        categories: list[Category],
+        health_results: dict[str, PackageHealthResult],
+        risk_analysis: RiskAnalysis,
+        type_counts: Counter,
+        total_packages: int,
+    ) -> dict[str, int]:
+        """Compute overall library health score (0-100) from four dimensions."""
+        if total_packages == 0:
+            return {"overall": 0, "structure": 0, "maintainability": 0, "reusability": 0, "duplication": 0}
+
+        # Structure: category balance + package distribution
+        structure = self._score_structure(categories, total_packages)
+
+        # Maintainability: average package health + risk penalties
+        maintainability = self._score_maintainability(health_results, risk_analysis.risks)
+
+        # Reusability: executable/workflow ratio
+        reusability = self._score_reusability(type_counts, total_packages)
+
+        # Duplication: based on duplicate clusters
+        duplication = self._score_duplication(risk_analysis)
+
+        overall = structure + maintainability + reusability + duplication
+        overall = min(100, overall)
+
+        return {
+            "overall": overall,
+            "structure": structure,
+            "maintainability": maintainability,
+            "reusability": reusability,
+            "duplication": duplication,
+        }
+
+    def _score_structure(self, categories: list[Category], total: int) -> int:
+        """Structure score (0-25)."""
+        score = 25
+
+        # Penalize category imbalance
+        if total > 0:
+            max_cat_ratio = max(c.package_count for c in categories) / total
+            if max_cat_ratio > 0.30:
+                score -= 5
+            elif max_cat_ratio > 0.20:
+                score -= 2
+
+        # Penalize many categories with only 1 package (fragmentation)
+        singleton_count = sum(1 for c in categories if c.package_count == 1)
+        if total > 10 and singleton_count / total > 0.30:
+            score -= 5
+        elif singleton_count > 5:
+            score -= 2
+
+        return max(0, score)
+
+    def _score_maintainability(self, health_results: dict[str, PackageHealthResult], risks: list) -> int:
+        """Maintainability score (0-25)."""
+        if not health_results:
+            return 0
+
+        avg_health = sum(h.overall for h in health_results.values()) / len(health_results)
+        score = int(avg_health * 25 / 100)  # normalize to 0-25
+
+        # Penalty for risk items (capped to prevent negative)
+        total_penalty = 0
+        for r in risks:
+            if r.severity.value in ("High", "Critical"):
+                total_penalty += 1
+            else:
+                total_penalty += 0.5
+        score -= min(int(total_penalty), 10)  # cap penalty at 10 points
+
+        return max(0, min(25, score))
+
+    def _score_reusability(self, type_counts: Counter, total: int) -> int:
+        """Reusability score (0-25)."""
+        if total == 0:
+            return 0
+
+        exec_count = type_counts.get(AssetType.EXECUTABLE_SKILL, 0)
+        workflow_count = type_counts.get(AssetType.WORKFLOW, 0)
+        usable_ratio = (exec_count + workflow_count) / total
+
+        # 0-25 scale: 100% usable = 25, 0% = 0
+        return int(usable_ratio * 25)
+
+    def _score_duplication(self, risk_analysis: RiskAnalysis) -> int:
+        """Duplication score (0-25). 25 = no issues."""
+        score = 25
+        score -= len(risk_analysis.risks) * 1  # reduced penalty
+        score -= len(risk_analysis.category_concentrations) * 2
+        return max(0, score)
+
+    def _build_governance_summary(
+        self,
+        categories: list[Category],
+        health_results: dict[str, PackageHealthResult],
+        risk_analysis: RiskAnalysis,
+        type_counts: Counter,
+        total_packages: int,
+    ) -> list[str]:
+        """Build the Governance Summary section."""
+        lines: list[str] = []
+
+        # Compute library health
+        health = self._compute_library_health(
+            categories, health_results, risk_analysis, type_counts, total_packages,
+        )
+        lines.append(f"**Library Health: {health['overall']} / 100**")
+        lines.append("")
+
+        # Strengths
+        strengths: list[str] = []
+        if total_packages > 0:
+            max_cat_ratio = max(c.package_count for c in categories) / total_packages
+            if max_cat_ratio <= 0.25:
+                strengths.append("Strong category diversity")
+            elif max_cat_ratio <= 0.30:
+                strengths.append("Acceptable category distribution")
+
+            exec_ratio = type_counts.get(AssetType.EXECUTABLE_SKILL, 0) / total_packages
+            if exec_ratio > 0.3:
+                strengths.append("Large executable skill inventory")
+            elif exec_ratio > 0.1:
+                strengths.append("Moderate executable skill coverage")
+
+            workflow_ratio = type_counts.get(AssetType.WORKFLOW, 0) / total_packages
+            if workflow_ratio > 0.2:
+                strengths.append("Good workflow package coverage")
+
+            if not risk_analysis.risks:
+                strengths.append("No oversized packages detected")
+
+        avg_health = sum(h.overall for h in health_results.values()) / len(health_results) if health_results else 0
+        if avg_health >= 70:
+            strengths.append("Good overall package health")
+        elif avg_health >= 50:
+            strengths.append("Moderate package health")
+
+        if strengths:
+            lines.append("**Strengths**")
+            for s in strengths:
+                lines.append(f"✓ {s}")
+
+        # Risks
+        risks: list[str] = []
+        if risk_analysis.risks:
+            critical_count = sum(1 for r in risk_analysis.risks if r.severity.value in ("High", "Critical"))
+            if critical_count > 0:
+                risks.append(f"{critical_count} oversized or bloated packages")
+            ref_bloat = [r for r in risk_analysis.risks if r.risk_type == "ref_bloat"]
+            tmpl_bloat = [r for r in risk_analysis.risks if r.risk_type == "template_bloat"]
+            if ref_bloat:
+                risks.append("Reference bloat in some packages")
+            if tmpl_bloat:
+                risks.append("Template concentration detected")
+
+        for cc in risk_analysis.category_concentrations:
+            risks.append(f"Category concentration: {cc.detail}")
+
+        if not risk_analysis.risks and not risk_analysis.category_concentrations:
+            pass  # no risks
+        elif risks:
+            lines.append("")
+            lines.append("**Risks**")
+            for r in risks:
+                lines.append(f"⚠ {r}")
+
+        return lines
+
+
+def value_score(hr, categories):
+    """Helper for the most valuable packages ranking.
+
+    Formula: Executable bonus + Supporting assets + Complexity - Risk
+    """
+    from .models import AssetType
+
+    pkg = None
+    for cat in categories:
+        for p in cat.packages:
+            if p.id == hr.package_id:
+                pkg = p
+                break
+        if pkg:
+            break
+    if not pkg:
+        return 0
+
+    # This is a placeholder — the actual scoring happens inline in generate()
+    return hr.overall
