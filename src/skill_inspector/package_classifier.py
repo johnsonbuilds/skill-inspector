@@ -85,7 +85,8 @@ class PackageClassifier:
 
                 try:
                     text = self._chat(user_content)
-                except Exception:
+                except Exception as e:
+                    logger.error("Chat classification attempt %d failed: %s", attempt + 1, e)
                     continue
 
                 # Try to parse as JSON array
@@ -129,9 +130,11 @@ class PackageClassifier:
                             results[pkg.id] = self._fallback_classify(pkg)
                             classified = True
                             break
-                        except Exception:
+                        except Exception as e:
+                            logger.error("Fallback classify attempt %d failed for package %s: %s", _attempt + 1, pkg.id, e)
                             continue
                     if not classified:
+                        logger.warning("Package %s (%s) classification failed after retries, defaulting to UNKNOWN", pkg.id, pkg.name)
                         results[pkg.id] = PackageClassification(
                             package=pkg,
                             type=AssetType.UNKNOWN,
@@ -177,7 +180,7 @@ class PackageClassifier:
         ).rstrip("/")
         if base.endswith("/chat/completions"):
             base = base.rsplit("/chat/completions", 1)[0]
-        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=600.0)
         resp = client.chat.completions.create(
             model=self.config.model,
             messages=[
@@ -191,7 +194,7 @@ class PackageClassifier:
 
     def _anthropic(self, prompt: str) -> str:
         base = (self.config.base_url or "https://api.anthropic.com/v1").rstrip("/")
-        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=600.0)
         resp = client.chat.completions.create(
             model=self.config.model,
             messages=[
@@ -205,7 +208,7 @@ class PackageClassifier:
 
     def _ollama(self, prompt: str) -> str:
         base = (self.config.base_url or "http://localhost:11434").rstrip("/")
-        client = OpenAI(base_url=f"{base}/api", api_key="ollama", timeout=30.0)
+        client = OpenAI(base_url=f"{base}/api", api_key="ollama", timeout=600.0)
         resp = client.chat.completions.create(
             model=self.config.model,
             messages=[
