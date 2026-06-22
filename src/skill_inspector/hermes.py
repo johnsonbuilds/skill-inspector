@@ -109,7 +109,7 @@ class HermesAdapter:
             # Check if this is a root-level skill folder (not a category):
             # A directory is root-level if skills/<folder>/SKILL.md exists directly.
             if (entry / "SKILL.md").exists():
-                pkg = self._discover_single_package(entry, category_name="root")
+                pkg = self._discover_single_package(entry, category_name=entry.name)
                 if pkg:
                     cat = Category(id=str(entry.relative_to(self.skills_dir)),
                                    name=entry.name, description="", packages=[pkg])

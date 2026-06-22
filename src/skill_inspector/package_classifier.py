@@ -23,11 +23,16 @@ SYSTEM_PROMPT = """You are an Agent Asset Auditor.
 You will receive N skill packages. For EACH package, classify its SKILL.md into exactly one category:
 
 - Knowledge: Facts, strategies, lessons learned, guidance
-- Workflow: Repeatable process or methodology
-- Executable Skill: Can directly perform a task with clear inputs and outputs
+- Workflow: Business process, operational process, multi-activity coordination
+- Executable Skill: Can directly perform a task with clear inputs and outputs. Includes:
+  - GitHub management, code review, issue management, repository management
+  - Tool operation skills (CLI tools, API clients, automation scripts)
+  - Packages with many procedural steps are still Executable Skill if they define a repeatable capability
 - Preference: User-specific behavior or style preference
 - Reference Material: External information stored for future use
 - Unknown: Classification confidence is low
+
+Do NOT classify tool-operation skills as Workflow. Tools that perform concrete tasks are Executable Skills, regardless of how many procedural steps they contain.
 
 Return your answer as a JSON array of objects, one per package, in this exact format:
 [

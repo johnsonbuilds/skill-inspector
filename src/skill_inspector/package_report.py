@@ -241,11 +241,11 @@ class PackageReportGenerator:
             "",
             "## Healthiest Packages",
             "",
-            "| Rank | Package | Category | Health | Archetype |",
-            "|---:|---|---|---:|---|",
+            "| Rank | Package | Category | Health |",
+            "|---:|---|---|---:|",
         ]
         for rank, hr in enumerate(healthiest, 1):
-            lines.append(f"| {rank} | `{hr.package_id}` | {hr.category} | {hr.overall} / 100 | {hr.archetype} |")
+            lines.append(f"| {rank} | `{hr.package_id}` | {hr.category} | {hr.overall} / 100 |")
 
         # Highest risk packages
         lines += [
