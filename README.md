@@ -131,7 +131,7 @@ Skill Inspector provides observability and governance for agent assets.
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_GITHUB/skill-inspector.git
+git clone https://github.com/johnsonbuilds/skill-inspector.git
 
 cd skill-inspector
 
