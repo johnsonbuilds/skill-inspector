@@ -18,11 +18,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="skill-inspector", description="Audit Hermes skill libraries.")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    scan = sub.add_parser("scan", help="Scan Hermes skills (asset-based) and generate report.md")
-    scan.add_argument("--data-dir", default="/opt/data", help="Directory containing config.yaml and skills/ (default: /opt/data)")
-    scan.add_argument("--output", default="report.md", help="Report path (default: report.md)")
-    scan.add_argument("--duplicate-threshold", type=float, default=0.82, help="Cosine similarity threshold for duplicate clusters")
-
     scan_pkg = sub.add_parser("scan-packages", help="Scan Hermes skills (package-aware) and generate report.md")
     scan_pkg.add_argument("--data-dir", default="/opt/data", help="Directory containing config.yaml and skills/ (default: /opt/data)")
     scan_pkg.add_argument("--output", default="report.md", help="Report path (default: report.md)")

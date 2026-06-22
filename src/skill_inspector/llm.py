@@ -186,6 +186,8 @@ class EmbeddingClient:
         self.config = config
 
     def embed(self, texts: list[str]) -> list[list[float]]:
+        logger.info("Embedding %d texts, provider=%s, model=%s, base_url=%s",
+                     len(texts), self.config.provider, self.config.model, self.config.base_url)
         try:
             return self._remote(texts)
         except Exception as e:
@@ -206,6 +208,9 @@ class EmbeddingClient:
                 break
         
         model = "text-embedding-3-small" if self.config.provider in {"openai", "openrouter", ""} else self.config.model
+        embed_url = f"{base}/embeddings"
+        logger.info("Embedding request: provider=%s model=%s url=%s num_texts=%d",
+                     self.config.provider, model, embed_url, len(texts))
         client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=600.0)
         resp = client.embeddings.create(model=model, input=texts)
         return [item.embedding for item in resp.data]
