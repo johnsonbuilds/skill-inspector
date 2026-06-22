@@ -15,38 +15,49 @@ from .report import ReportGenerator
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="skill-inspector", description="Audit Hermes skill libraries.")
+    parser = argparse.ArgumentParser(
+        prog="skill-inspector", description="Audit Hermes skill libraries."
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    scan_pkg = sub.add_parser("scan-packages", help="Scan Hermes skills (package-aware) and generate report.md")
-    scan_pkg.add_argument("--data-dir", default="/opt/data", help="Directory containing config.yaml and skills/ (default: /opt/data)")
-    scan_pkg.add_argument("--output", default="report.md", help="Report path (default: report.md)")
-    scan_pkg.add_argument("--duplicate-threshold", type=float, default=0.82, help="Cosine similarity threshold for duplicate clusters")
+    scan_pkg = sub.add_parser(
+        "scan-packages",
+        help="Scan Hermes skills (package-aware) and generate report.md",
+    )
+    scan_pkg.add_argument(
+        "--data-dir",
+        default="/opt/data",
+        help="Directory containing config.yaml and skills/ (default: /opt/data)",
+    )
+    scan_pkg.add_argument(
+        "--output", default="report.md", help="Report path (default: report.md)"
+    )
+    scan_pkg.add_argument(
+        "--duplicate-threshold",
+        type=float,
+        default=0.82,
+        help="Cosine similarity threshold for duplicate clusters",
+    )
 
     health = sub.add_parser("health", help="Generate health report only (v0.3)")
-    health.add_argument("--data-dir", default="/opt/data", help="Directory containing config.yaml and skills/ (default: /opt/data)")
-    health.add_argument("--output", default="health-report.md", help="Report path (default: health-report.md)")
-    health.add_argument("--duplicate-threshold", type=float, default=0.82, help="Cosine similarity threshold for duplicate clusters")
+    health.add_argument(
+        "--data-dir",
+        default="/opt/data",
+        help="Directory containing config.yaml and skills/ (default: /opt/data)",
+    )
+    health.add_argument(
+        "--output",
+        default="health-report.md",
+        help="Report path (default: health-report.md)",
+    )
+    health.add_argument(
+        "--duplicate-threshold",
+        type=float,
+        default=0.82,
+        help="Cosine similarity threshold for duplicate clusters",
+    )
 
     return parser
-
-
-def scan(args: argparse.Namespace) -> int:
-    """Asset-based scan (existing implementation)."""
-    adapter = HermesAdapter(Path(args.data_dir))
-    model_config = adapter.load_model_config()
-    assets = adapter.discover_assets()
-    classifier = LLMClassifier(model_config)
-    classifications = classifier.classify_batch(assets)
-    clusters = DuplicateDetector(EmbeddingClient(model_config), args.duplicate_threshold).detect(assets)
-    ReportGenerator().generate(assets, classifications, clusters, Path(args.output))
-    counts = Counter(c.type.value for c in classifications.values())
-    print(f"Assets Found: {len(assets)}\n")
-    for name in ["Knowledge", "Workflow", "Preference", "Executable Skill", "Reference Material", "Unknown"]:
-        print(f"{name}: {counts.get(name, 0)}")
-    print(f"\nDuplicate Clusters: {len(clusters)}\n")
-    print("Report written: " + str(Path(args.output)))
-    return 0
 
 
 def scan_packages(args: argparse.Namespace) -> int:
@@ -57,7 +68,9 @@ def scan_packages(args: argparse.Namespace) -> int:
     # Discover packages
     categories = adapter.discover_packages()
     total_packages = sum(cat.package_count for cat in categories)
-    total_assets = sum(pkg.total_asset_count for cat in categories for pkg in cat.packages)
+    total_assets = sum(
+        pkg.total_asset_count for cat in categories for pkg in cat.packages
+    )
     print(f"Categories Found: {len(categories)}")
     print(f"Skill Packages: {total_packages}")
     print(f"Total Assets: {total_assets}\n")
@@ -75,7 +88,9 @@ def scan_packages(args: argparse.Namespace) -> int:
 
     # Detect duplicates
     all_packages = [pkg for cat in categories for pkg in cat.packages]
-    pkg_dup_detector = PackageDuplicateDetector(EmbeddingClient(model_config), args.duplicate_threshold)
+    pkg_dup_detector = PackageDuplicateDetector(
+        EmbeddingClient(model_config), args.duplicate_threshold
+    )
     dup_clusters = pkg_dup_detector.detect(all_packages)
     print(f"Duplicate Package Clusters: {len(dup_clusters)}\n")
 
@@ -110,7 +125,9 @@ def health_cmd(args: argparse.Namespace) -> int:
 
     # Detect duplicates
     all_packages = [pkg for cat in categories for pkg in cat.packages]
-    pkg_dup_detector = PackageDuplicateDetector(EmbeddingClient(model_config), args.duplicate_threshold)
+    pkg_dup_detector = PackageDuplicateDetector(
+        EmbeddingClient(model_config), args.duplicate_threshold
+    )
     dup_clusters = pkg_dup_detector.detect(all_packages)
     print(f"Duplicate Package Clusters: {len(dup_clusters)}\n")
 
@@ -124,8 +141,6 @@ def health_cmd(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command == "scan":
-        return scan(args)
     if args.command == "scan-packages":
         return scan_packages(args)
     if args.command == "health":
