@@ -13,6 +13,7 @@ from .models import (
 from .health_scoring import PackageHealthResult, score_package
 from .risk_analysis import RiskAnalysis, detect_risks
 from .recommendations import Recommendation, generate_recommendations
+from .usage_analysis import UsageAnalysis, analyze_usage, load_usage_data
 
 
 class PackageReportGenerator:
@@ -60,6 +61,15 @@ class PackageReportGenerator:
             risk_analysis.risks + risk_analysis.category_concentrations,
             len(duplicate_clusters),
         )
+
+        # --- Runtime usage analysis (v0.4) ---
+        usage_records = load_usage_data()
+        all_pkgs = [pkg for cat in categories for pkg in cat.packages]
+        usage_analysis = analyze_usage(usage_records, all_pkgs, categories)
+
+        # Generate utilization-based recommendations
+        utilization_recs = _generate_utilization_recommendations(usage_analysis, total_packages)
+        recommendations.extend(utilization_recs)
 
         # --- Library-level health score ---
         library_health = self._compute_library_health(
@@ -179,6 +189,8 @@ class PackageReportGenerator:
             f"- **Total Skill Packages**: {total_packages}",
             f"- **Total Assets**: {total_assets}",
             f"- **Duplicate Clusters**: {len(duplicate_clusters)}",
+            "",
+        ] + _build_utilization_section(usage_analysis) + [
             "",
             "## Library Health Score",
             "",
@@ -554,3 +566,132 @@ def value_score(hr, categories):
 
     # This is a placeholder — the actual scoring happens inline in generate()
     return hr.overall
+
+
+def _build_utilization_section(usage: UsageAnalysis) -> list[str]:
+    """Build the Skill Utilization section for the report (v0.4)."""
+    lines: list[str] = [
+        "## Skill Utilization",
+        "",
+    ]
+
+    # Check if usage data is available
+    has_data = usage.installed_skills > 0 or usage.used_skills > 0
+
+    if not has_data:
+        lines.append("*No usage data available. Runtime governance analysis skipped.*")
+        lines.append("")
+        return lines
+
+    lines.append(f"**Installed Skills**: {usage.installed_skills}")
+    lines.append("")
+    lines.append(f"**Used Skills**: {usage.used_skills}")
+    lines.append("")
+    lines.append(f"**Unused Skills**: {usage.unused_skills}")
+    lines.append("")
+    lines.append(f"**Utilization Rate**: {usage.utilization_rate}%")
+    lines.append("")
+
+    # Most Used Skills
+    if usage.most_used:
+        lines.append("### Most Used Skills")
+        lines.append("")
+        lines.append("| Skill | Uses |")
+        lines.append("|---|---:|")
+        for skill_id, use_count in usage.most_used:
+            lines.append(f"| `{skill_id}` | {use_count} |")
+        lines.append("")
+
+    # Recently Used Skills
+    if usage.recently_used:
+        lines.append("### Recently Used Skills")
+        lines.append("")
+        lines.append("| Skill | Last Used |")
+        lines.append("|---|---|")
+        for skill_id, last_date in usage.recently_used:
+            date_str = last_date if last_date else "N/A"
+            lines.append(f"| `{skill_id}` | {date_str} |")
+        lines.append("")
+
+    # Never Used Skills (limited to 20)
+    if usage.never_used:
+        lines.append("### Never Used Skills")
+        lines.append("")
+        lines.append(f"*{usage.unused_skills} skills have never been used.*")
+        lines.append("")
+        lines.append("| Skill | Category |")
+        lines.append("|---|---|")
+        for skill_id, category in usage.never_used:
+            lines.append(f"| `{skill_id}` | {category} |")
+        if usage.unused_skills > 20:
+            lines.append(f"\n*... and {usage.unused_skills - 20} more*")
+        lines.append("")
+
+    # Category Utilization
+    if usage.category_utilization:
+        lines.append("### Category Utilization")
+        lines.append("")
+        lines.append("| Category | Utilization | Used / Total |")
+        lines.append("|---|---:|---:|")
+        for cat_name, pct, used, total in usage.category_utilization:
+            lines.append(f"| {cat_name} | {pct}% | {used} / {total} |")
+        lines.append("")
+
+    return lines
+
+
+def _generate_utilization_recommendations(
+    usage: UsageAnalysis, total_packages: int,
+) -> list[Recommendation]:
+    """Generate utilization-based governance recommendations (v0.4)."""
+    recs: list[Recommendation] = []
+
+    if usage.installed_skills == 0:
+        return recs
+
+    # Unused skills recommendation
+    if usage.unused_skills > 0:
+        recs.append(Recommendation(
+            package_id=None,
+            category=None,
+            severity="Medium" if usage.unused_skills < 50 else "High",
+            title="Review unused skills for archival",
+            description=(
+                f"{usage.unused_skills} skills have never been used. "
+                f"({usage.utilization_rate}% utilization rate)"
+            ),
+            action="Consider archiving unused skills to reduce library bloat. "
+                   "Unused skills consume memory and increase classification overhead.",
+        ))
+
+    # Low utilization rate
+    if usage.utilization_rate < 10 and usage.installed_skills > 10:
+        recs.append(Recommendation(
+            package_id=None,
+            category=None,
+            severity="High",
+            title="Skill utilization is below 10%",
+            description=(
+                f"Only {usage.utilization_rate}% of installed skills are actively used. "
+                f"Large portions of the library may no longer provide value."
+            ),
+            action="Review the unused skills list and consider removing or archiving "
+                   "skills that are no longer relevant to your workflow.",
+        ))
+
+    # Category with 0% utilization
+    for cat_name, pct, used, total in usage.category_utilization:
+        if pct == 0 and total > 0:
+            recs.append(Recommendation(
+                package_id=None,
+                category=cat_name,
+                severity="Low",
+                title=f"Category '{cat_name}' has 0% utilization",
+                description=(
+                    f"All {total} skills in the '{cat_name}' category have never been used."
+                ),
+                action="Review whether these skills are still relevant to the current environment. "
+                       "Consider archiving the entire category if unused.",
+            ))
+
+    return recs
