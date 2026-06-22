@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import math
 import re
-import urllib.error
-import urllib.request
 from collections import Counter
 from typing import Any
+
+from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 
 from .hermes import HermesModelConfig
 from .models import Asset, AssetType, Classification
 
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are an Agent Asset Auditor.
 
@@ -132,40 +134,40 @@ class LLMClassifier:
         # Ensure base ends with /v1 (OpenAI-compatible convention), not /v1/chat/completions
         if base.endswith("/chat/completions"):
             base = base.rsplit("/chat/completions", 1)[0]
-        payload = {"model": self.config.model, "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}], "temperature": 0, "response_format": {"type": "json_object"}}
-        data = self._post(f"{base}/chat/completions", payload, auth=True)
-        return data["choices"][0]["message"]["content"]
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+            temperature=0,
+            response_format={"type": "json_object"},
+        )
+        return resp.choices[0].message.content
 
     def _anthropic(self, prompt: str) -> str:
-        payload = {"model": self.config.model, "max_tokens": 800, "temperature": 0, "system": SYSTEM_PROMPT, "messages": [{"role": "user", "content": prompt}]}
-        data = self._post((self.config.base_url or "https://api.anthropic.com/v1").rstrip("/") + "/messages", payload, auth=True, extra={"anthropic-version": "2023-06-01"})
-        return data["content"][0]["text"]
+        base = (self.config.base_url or "https://api.anthropic.com/v1").rstrip("/")
+        # Anthropic's /v1/messages endpoint is compatible with OpenAI SDK format
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=800,
+            temperature=0,
+        )
+        return resp.choices[0].message.content
 
     def _ollama(self, prompt: str) -> str:
-        payload = {"model": self.config.model, "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}], "stream": False, "format": "json"}
-        data = self._post((self.config.base_url or "http://localhost:11434").rstrip("/") + "/api/chat", payload, auth=False)
-        return data["message"]["content"]
-
-    def _post(self, url: str, payload: dict[str, Any], auth: bool, extra: dict[str, str] | None = None) -> dict[str, Any]:
-        headers = {"Content-Type": "application/json", **(extra or {})}
-        if auth and self.config.api_key:
-            headers["Authorization"] = f"Bearer {self.config.api_key}"
-            if self.config.provider == "anthropic":
-                headers["x-api-key"] = self.config.api_key
-                headers.pop("Authorization", None)
-        req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.loads(resp.read().decode())
-
-    def _post_safe(self, url: str, payload: dict[str, Any], auth: bool, extra: dict[str, str] | None = None) -> dict[str, Any]:
-        """Same as _post but raises on HTTP errors instead of crashing."""
-        try:
-            return self._post(url, payload, auth, extra)
-        except urllib.error.HTTPError as e:
-            body = e.read().decode() if hasattr(e, 'read') else str(e)
-            raise RuntimeError(f"HTTP {e.code} from {url}: {body[:500]}")
-        except Exception as e:
-            raise RuntimeError(f"Request failed to {url}: {e}")
+        base = (self.config.base_url or "http://localhost:11434").rstrip("/")
+        client = OpenAI(base_url=f"{base}/api", api_key="ollama", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+            stream=False,
+            format="json",
+        )
+        return resp.choices[0].message.content
 
     def _json(self, text: str) -> dict[str, Any]:
         try:
@@ -184,32 +186,31 @@ class EmbeddingClient:
     def embed(self, texts: list[str]) -> list[list[float]]:
         try:
             return self._remote(texts)
-        except Exception:
+        except Exception as e:
+            logger.warning("Remote embedding failed (%s), falling back to local hash", e)
             return [self._local_embedding(t) for t in texts]
 
     def _remote(self, texts: list[str]) -> list[list[float]]:
         if self.config.provider == "ollama":
             base = (self.config.base_url or "http://localhost:11434").rstrip("/")
-            return [self._ollama_embed(base, t) for t in texts]
+            client = OpenAI(base_url=f"{base}/api", api_key="ollama", timeout=30.0)
+            return [self._ollama_embed(client, t) for t in texts]
+        
         base = (self.config.base_url or ("https://openrouter.ai/api/v1" if self.config.provider == "openrouter" else "https://api.openai.com/v1")).rstrip("/")
         # Strip trailing path segments if base_url already contains them
         for suffix in ("/chat/completions", "/embeddings"):
             if base.endswith(suffix):
                 base = base.rsplit(suffix, 1)[0]
                 break
+        
         model = "text-embedding-3-small" if self.config.provider in {"openai", "openrouter", ""} else self.config.model
-        headers = {"Content-Type": "application/json"}
-        if self.config.api_key:
-            headers["Authorization"] = f"Bearer {self.config.api_key}"
-        req = urllib.request.Request(f"{base}/embeddings", data=json.dumps({"model": model, "input": texts}).encode(), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = json.loads(resp.read().decode())
-        return [item["embedding"] for item in data["data"]]
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        resp = client.embeddings.create(model=model, input=texts)
+        return [item.embedding for item in resp.data]
 
-    def _ollama_embed(self, base: str, text: str) -> list[float]:
-        req = urllib.request.Request(f"{base}/api/embeddings", data=json.dumps({"model": self.config.model, "prompt": text}).encode(), headers={"Content-Type": "application/json"}, method="POST")
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.loads(resp.read().decode())["embedding"]
+    def _ollama_embed(self, client: OpenAI, text: str) -> list[float]:
+        resp = client.embeddings.create(model=self.config.model, input=text)
+        return resp.data[0].embedding
 
     def _local_embedding(self, text: str, dims: int = 384) -> list[float]:
         vec = [0.0] * dims

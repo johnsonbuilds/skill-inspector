@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any
+
+from openai import OpenAI
 
 from .hermes import HermesModelConfig
 from .models import (
@@ -13,6 +16,7 @@ from .models import (
     SkillPackage,
 )
 
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are an Agent Asset Auditor.
 
@@ -173,70 +177,45 @@ class PackageClassifier:
         ).rstrip("/")
         if base.endswith("/chat/completions"):
             base = base.rsplit("/chat/completions", 1)[0]
-        payload = {
-            "model": self.config.model,
-            "messages": [
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            "temperature": 0,
-            "response_format": {"type": "json_object"},
-        }
-        data = self._post(f"{base}/chat/completions", payload, auth=True)
-        return data["choices"][0]["message"]["content"]
+            temperature=0,
+            response_format={"type": "json_object"},
+        )
+        return resp.choices[0].message.content
 
     def _anthropic(self, prompt: str) -> str:
-        payload = {
-            "model": self.config.model,
-            "max_tokens": 800,
-            "temperature": 0,
-            "system": SYSTEM_PROMPT,
-            "messages": [{"role": "user", "content": prompt}],
-        }
-        data = self._post(
-            (self.config.base_url or "https://api.anthropic.com/v1").rstrip("/") + "/messages",
-            payload,
-            auth=True,
-            extra={"anthropic-version": "2023-06-01"},
-        )
-        return data["content"][0]["text"]
-
-    def _ollama(self, prompt: str) -> str:
-        payload = {
-            "model": self.config.model,
-            "messages": [
+        base = (self.config.base_url or "https://api.anthropic.com/v1").rstrip("/")
+        client = OpenAI(base_url=base, api_key=self.config.api_key or "not-needed", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            "stream": False,
-            "format": "json",
-        }
-        data = self._post(
-            (self.config.base_url or "http://localhost:11434").rstrip("/") + "/api/chat",
-            payload,
-            auth=False,
+            max_tokens=800,
+            temperature=0,
         )
-        return data["message"]["content"]
+        return resp.choices[0].message.content
 
-    def _post(
-        self,
-        url: str,
-        payload: dict[str, Any],
-        auth: bool,
-        extra: dict[str, str] | None = None,
-    ) -> dict[str, Any]:
-        headers = {"Content-Type": "application/json", **(extra or {})}
-        if auth and self.config.api_key:
-            headers["Authorization"] = f"Bearer {self.config.api_key}"
-            if self.config.provider == "anthropic":
-                headers["x-api-key"] = self.config.api_key
-                headers.pop("Authorization", None)
-        import urllib.request
-        req = urllib.request.Request(
-            url, data=json.dumps(payload).encode(), headers=headers, method="POST"
+    def _ollama(self, prompt: str) -> str:
+        base = (self.config.base_url or "http://localhost:11434").rstrip("/")
+        client = OpenAI(base_url=f"{base}/api", api_key="ollama", timeout=30.0)
+        resp = client.chat.completions.create(
+            model=self.config.model,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False,
+            format="json",
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.loads(resp.read().decode())
+        return resp.choices[0].message.content
 
     def _json(self, text: str) -> dict[str, Any]:
         try:

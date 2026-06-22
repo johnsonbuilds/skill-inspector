@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Audit Hermes skill libraries and report what agents are learning."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["openai>=1.0.0"]
 
 [project.scripts]
 skill-inspector = "skill_inspector.cli:main"
