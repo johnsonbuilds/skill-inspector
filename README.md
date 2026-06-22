@@ -1,6 +1,6 @@
 # Skill Inspector
 
-**Governance for Hermes Skills.**
+**Governance and Health Checks for Hermes Skills.**
 
 As AI agents accumulate skills, templates, references, scripts, and knowledge, a new problem emerges:
 
@@ -91,23 +91,19 @@ Improve executable skill coverage
 
 ---
 
-## Example Findings
+## Example Report
 
-A typical report may reveal:
+### Overview
 
-```text
-74 Skill Packages
+![Overview](docs/report-overview.png)
 
-418 Assets
+### Risk Analysis
 
-Top Risk Package:
-popular-web-designs
+![Risk Analysis](docs/report-risks.png)
 
-54 templates
+### Governance Recommendations
 
-Health Score:
-66 / 100
-```
+![Governance Recommendations](docs/report-recommendations.png)
 
 ---
 
