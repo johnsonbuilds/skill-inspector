@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 
 
@@ -85,17 +86,13 @@ def match_usage_to_packages(
     for pkg_id in installed_ids:
         record = None
 
-        # Strategy 1: exact match (root-level skills like 'dogfood')
         if pkg_id in usage_records:
             record = usage_records[pkg_id]
         else:
-            # Strategy 2: extract last component and match
-            # e.g., 'devops/agent-skill-governance' -> 'agent-skill-governance'
             flat_name = pkg_id.rsplit("/", 1)[-1]
             if flat_name in usage_records:
                 record = usage_records[flat_name]
             else:
-                # Strategy 3: try 'category:name' format
                 parts = pkg_id.rsplit("/", 1)
                 if len(parts) == 2:
                     cat, name = parts
@@ -108,31 +105,49 @@ def match_usage_to_packages(
     return result
 
 
+def is_package_used(record: UsageRecord | None) -> bool:
+    """A package is considered used only when use_count > 0."""
+    return bool(record and record.use_count > 0)
+
+
+def is_recently_used(record: UsageRecord | None, days: int = 3) -> bool:
+    """Return True when last_used_at falls within the trailing N-day window."""
+    if not record or not record.last_used_at:
+        return False
+
+    try:
+        last_used = datetime.fromisoformat(record.last_used_at.replace("Z", "+00:00")).date()
+    except ValueError:
+        return False
+
+    delta = (date.today() - last_used).days
+    return 0 <= delta <= days
+
+
 def analyze_usage(
     usage_records: dict[str, UsageRecord],
-    packages: list,  # SkillPackage objects
-    categories: list,  # Category objects
+    packages: list,
+    categories: list,
 ) -> UsageAnalysis:
     """Perform full usage analysis and return aggregated results."""
     analysis = UsageAnalysis()
     analysis.installed_skills = len(packages)
+    analysis.usage_records = usage_records
 
-    # Match usage to packages
     pkg_ids = [p.id for p in packages]
     matched = match_usage_to_packages(usage_records, pkg_ids)
 
-    # Build category lookup
     cat_lookup: dict[str, str] = {}
     for cat in categories:
         for pkg in cat.packages:
             cat_lookup[pkg.id] = cat.name
 
     used_ids: list[str] = []
-    unused_entries: list[tuple[str, str]] = []  # (pkg_id, category)
+    unused_entries: list[tuple[str, str]] = []
 
     for pkg_id, record in matched.items():
         cat_name = cat_lookup.get(pkg_id, "unknown")
-        if record and (record.use_count > 0 or record.view_count > 0):
+        if is_package_used(record):
             used_ids.append(pkg_id)
         else:
             unused_entries.append((pkg_id, cat_name))
@@ -142,41 +157,36 @@ def analyze_usage(
     total = max(len(packages), 1)
     analysis.utilization_rate = round(analysis.used_skills / total * 100, 1)
 
-    # Most used: sort by use_count DESC
     used_with_counts = [
-        (pkg_id, (matched[pkg_id].use_count if matched[pkg_id] else 0))
+        (pkg_id, matched[pkg_id].use_count if matched[pkg_id] else 0)
         for pkg_id in used_ids
     ]
     used_with_counts.sort(key=lambda x: x[1], reverse=True)
     analysis.most_used = used_with_counts
 
-    # Recently used: sort by last_used_at DESC
     recently: list[tuple[str, str | None]] = []
     for pkg_id in used_ids:
         rec = matched[pkg_id]
-        if rec and rec.last_used_at:
-            date_str = rec.last_used_at[:10]  # YYYY-MM-DD
-            recently.append((pkg_id, date_str))
+        if rec and rec.last_used_at and is_recently_used(rec, days=3):
+            recently.append((pkg_id, rec.last_used_at[:10]))
     recently.sort(key=lambda x: x[1] or "", reverse=True)
     analysis.recently_used = recently
 
-    # Never used: limited to first 20
-    analysis.never_used = unused_entries[:20]
+    analysis.never_used = unused_entries
 
-    # Category utilization
     cat_stats: dict[str, dict[str, int]] = {}
     for pkg_id, record in matched.items():
         cat_name = cat_lookup.get(pkg_id, "unknown")
         if cat_name not in cat_stats:
             cat_stats[cat_name] = {"total": 0, "used": 0}
         cat_stats[cat_name]["total"] += 1
-        if record and (record.use_count > 0 or record.view_count > 0):
+        if is_package_used(record):
             cat_stats[cat_name]["used"] += 1
 
     for cat_name, stats in cat_stats.items():
         if stats["total"] > 0:
             pct = round(stats["used"] / stats["total"] * 100)
             analysis.category_utilization.append((cat_name, pct, stats["used"], stats["total"]))
-    analysis.category_utilization.sort(key=lambda x: x[1], reverse=True)
+    analysis.category_utilization.sort(key=lambda x: (x[1], x[2], x[3]), reverse=True)
 
     return analysis
