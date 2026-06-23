@@ -173,22 +173,7 @@ class PackageReportGenerator:
         ]
 
         lines += governance_summary
-        lines += self._build_runtime_governance(usage_analysis, matched_usage, package_lookup)
-
-        lines += [
-            "## Unused High-Cost Skills",
-            "",
-            f"{len(unused_high_cost)} installed skills have no recorded executions. The table shows the top 10 by complexity.",
-            "",
-            "| Skill | Category | Complexity | References | Templates | Scripts |",
-            "| ----- | -------- | ----------: | ----------: | ---------: | --------: |",
-        ]
-        for pkg in unused_high_cost[:10]:
-            lines.append(
-                f"| `{pkg.id}` | {pkg.category} | {pkg.complexity_score} | "
-                f"{pkg.references_count} | {pkg.templates_count} | {pkg.scripts_count} |"
-            )
-        lines.append("")
+        lines += self._build_runtime_governance(usage_analysis, matched_usage, package_lookup, unused_high_cost)
 
         lines += self._render_cleanup_priorities(cleanup_priorities)
 
@@ -452,6 +437,7 @@ class PackageReportGenerator:
         usage: UsageAnalysis,
         matched_usage: dict[str, UsageRecord | None],
         package_lookup: dict[str, SkillPackage],
+        unused_high_cost: list[SkillPackage],
     ) -> list[str]:
         """Build the Runtime Governance section (v0.4.2)."""
         lines = [
@@ -496,21 +482,19 @@ class PackageReportGenerator:
             lines.append(f"| `{pkg_id}` | {last_used} |")
         lines.append("")
 
-        never_used_ranked = sorted(
-            usage.never_used,
-            key=lambda item: package_lookup.get(item[0]).complexity_score if package_lookup.get(item[0]) else 0,
-            reverse=True,
-        )
-
-        lines.append("### Never Used Skills")
-        lines.append("")
-        lines.append(f"{usage.unused_skills} skills remain completely unused. The table shows the 10 most complex.")
-        lines.append("")
-        lines.append("| Skill | Category | Complexity |")
-        lines.append("| ----- | -------- | ----------: |")
-        for pkg_id, category in never_used_ranked[:10]:
-            complexity = package_lookup.get(pkg_id).complexity_score if package_lookup.get(pkg_id) else 0
-            lines.append(f"| `{pkg_id}` | {category} | {complexity} |")
+        lines += [
+            "### Unused High-Cost Skills",
+            "",
+            f"{len(unused_high_cost)} installed skills have no recorded executions. The table shows the top 10 by complexity.",
+            "",
+            "| Skill | Category | Complexity | References | Templates | Scripts |",
+            "| ----- | -------- | ----------: | ----------: | ---------: | --------: |",
+        ]
+        for pkg in unused_high_cost[:10]:
+            lines.append(
+                f"| `{pkg.id}` | {pkg.category} | {pkg.complexity_score} | "
+                f"{pkg.references_count} | {pkg.templates_count} | {pkg.scripts_count} |"
+            )
         lines.append("")
 
         zero_util_categories = sum(1 for _, pct, _, _ in usage.category_utilization if pct == 0)

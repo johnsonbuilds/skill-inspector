@@ -19,24 +19,26 @@ Utilization Rate: 5.7%
 
 ## Library Health Score
 
-**Overall Health: 68 / 100**
+**Overall Health: 67 / 100**
 
 - **Structure**: 21 / 25
 - **Maintainability**: 13 / 25
-- **Reusability**: 22 / 25
+- **Reusability**: 21 / 25
 - **Duplication**: 12 / 25
 
 ## Governance Summary
 
-• Health score is below recommended level.
-• Only 5.7% of installed skills have been used.
-• 66 skills have never been used.
-• Several large unused packages represent maintenance overhead.
-• Duplicate package risk remains low.
+• Only 5.7% of installed skills have ever been executed.
+• 66 skills have never been executed.
+• `productivity/powerpoint` is the largest unused package by complexity (135).
+• `creative/popular-web-designs` has the lowest health score at 46 / 100.
+• Library health is below target at 67 / 100.
 
 ## Runtime Governance
 
 ### Most Used Skills
+
+Only 4 of 70 installed skills have ever been executed.
 
 | Skill | Uses | Views | Last Used |
 | ----- | ---: | ----: | --------- |
@@ -47,41 +49,33 @@ Utilization Rate: 5.7%
 
 ### Recently Used Skills
 
+Skills executed within the last 3 days.
+
 | Skill | Last Used |
 | ----- | --------- |
 | `governance/skill-health-check` | 2026-06-23 |
 | `autonomous-ai-agents/hermes-agent` | 2026-06-22 |
-| `creative/wavespeed` | 2026-06-17 |
-| `dogfood` | 2026-06-12 |
 
 ### Never Used Skills
 
-66 skills have never been used.
+66 skills remain completely unused. The table shows the 10 most complex.
 
-| Skill | Category |
-| ----- | -------- |
-| `apple/apple-notes` | apple |
-| `apple/apple-reminders` | apple |
-| `apple/findmy` | apple |
-| `apple/imessage` | apple |
-| `apple/macos-computer-use` | apple |
-| `autonomous-ai-agents/claude-code` | autonomous-ai-agents |
-| `autonomous-ai-agents/codex` | autonomous-ai-agents |
-| `autonomous-ai-agents/opencode` | autonomous-ai-agents |
-| `creative/architecture-diagram` | creative |
-| `creative/ascii-art` | creative |
-| `creative/ascii-video` | creative |
-| `creative/baoyu-infographic` | creative |
-| `creative/claude-design` | creative |
-| `creative/comfyui` | creative |
-| `creative/design-md` | creative |
-| `creative/excalidraw` | creative |
-| `creative/humanizer` | creative |
-| `creative/manim-video` | creative |
-| `creative/p5js` | creative |
-| `creative/popular-web-designs` | creative |
+| Skill | Category | Complexity |
+| ----- | -------- | ----------: |
+| `productivity/powerpoint` | productivity | 135 |
+| `creative/popular-web-designs` | creative | 108 |
+| `research/research-paper-writing` | research | 99 |
+| `creative/comfyui` | creative | 54 |
+| `creative/baoyu-infographic` | creative | 46 |
+| `creative/p5js` | creative | 25 |
+| `creative/touchdesigner-mcp` | creative | 24 |
+| `creative/manim-video` | creative | 18 |
+| `red-teaming/godmode` | red-teaming | 18 |
+| `productivity/google-workspace` | productivity | 13 |
 
 ### Category Utilization
+
+15 categories have 0% utilization and are collapsed from the table.
 
 | Category | Utilization | Used / Total |
 | -------- | ----------: | ------------ |
@@ -89,21 +83,40 @@ Utilization Rate: 5.7%
 | governance | 100% | 1 / 1 |
 | autonomous-ai-agents | 25% | 1 / 4 |
 | creative | 6% | 1 / 17 |
-| apple | 0% | 0 / 5 |
-| data-science | 0% | 0 / 1 |
-| devops | 0% | 0 / 2 |
-| email | 0% | 0 / 1 |
-| github | 0% | 0 / 6 |
-| media | 0% | 0 / 4 |
-| mlops | 0% | 0 / 1 |
-| note-taking | 0% | 0 / 1 |
-| productivity | 0% | 0 / 8 |
-| red-teaming | 0% | 0 / 1 |
-| research | 0% | 0 / 5 |
-| smart-home | 0% | 0 / 1 |
-| social-media | 0% | 0 / 1 |
-| software-development | 0% | 0 / 9 |
-| yuanbao | 0% | 0 / 1 |
+
+## Unused High-Cost Skills
+
+66 installed skills have no recorded executions. The table shows the top 10 by complexity.
+
+| Skill | Category | Complexity | References | Templates | Scripts |
+| ----- | -------- | ----------: | ----------: | ---------: | --------: |
+| `productivity/powerpoint` | productivity | 135 | 0 | 0 | 44 |
+| `creative/popular-web-designs` | creative | 108 | 0 | 54 | 0 |
+| `research/research-paper-writing` | research | 99 | 9 | 45 | 0 |
+| `creative/comfyui` | creative | 54 | 4 | 0 | 11 |
+| `creative/baoyu-infographic` | creative | 46 | 45 | 0 | 0 |
+| `creative/p5js` | creative | 25 | 10 | 1 | 4 |
+| `creative/touchdesigner-mcp` | creative | 24 | 21 | 0 | 1 |
+| `creative/manim-video` | creative | 18 | 14 | 0 | 1 |
+| `red-teaming/godmode` | red-teaming | 18 | 2 | 2 | 4 |
+| `productivity/google-workspace` | productivity | 13 | 1 | 0 | 4 |
+
+## Cleanup Priorities
+
+If you only clean up a few packages first, start with the highest-scoring unused packages below.
+
+| Rank | Package | Priority Score | Reason |
+| ----: | ------- | -------------: | ------ |
+| 1 | `creative/popular-web-designs` | 110 | Unused + Complexity 108 + Health 46 + 2 risk signals |
+| 2 | `productivity/powerpoint` | 95 | Unused + Complexity 135 + 2 risk signals |
+| 3 | `research/research-paper-writing` | 85 | Unused + Complexity 99 + 2 risk signals |
+| 4 | `creative/comfyui` | 85 | Unused + Complexity 54 + 2 risk signals |
+| 5 | `creative/touchdesigner-mcp` | 75 | Unused + Complexity 24 + 2 risk signals |
+| 6 | `creative/baoyu-infographic` | 75 | Unused + Complexity 46 + 2 risk signals |
+| 7 | `creative/p5js` | 65 | Unused + Complexity 25 + 1 risk signal |
+| 8 | `yuanbao` | 40 | Unused |
+| 9 | `software-development/test-driven-development` | 40 | Unused |
+| 10 | `software-development/systematic-debugging` | 40 | Unused |
 
 ## Governance Recommendations
 
@@ -167,83 +180,10 @@ Utilization Rate: 5.7%
 - **Description**: Only 5.7% of installed skills are actively used. Large portions of the library may no longer provide value.
 - **Action**: Review the unused skills list and consider removing or archiving skills that are no longer relevant to your workflow.
 
-### Split monolithic package
-- **Scope**: `creative/baoyu-infographic`
-- **Severity**: Medium
-- **Description**: `creative/baoyu-infographic` has complexity 46 with 0 templates, 45 references, 0 scripts.
-- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+Additional Recommendations Hidden
 
-### Modularize scripts
-- **Scope**: `creative/comfyui`
-- **Severity**: Medium
-- **Description**: `creative/comfyui` has 11 script files.
-- **Action**: Group related scripts into sub-packages or a scripts library. Consider whether all scripts serve a single executable purpose.
-
-### Split monolithic package
-- **Scope**: `creative/p5js`
-- **Severity**: Medium
-- **Description**: `creative/p5js` has complexity 25 with 1 templates, 10 references, 4 scripts.
-- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
-
-### Split monolithic package
-- **Scope**: `creative/touchdesigner-mcp`
-- **Severity**: Medium
-- **Description**: `creative/touchdesigner-mcp` has complexity 24 with 0 templates, 21 references, 1 scripts.
-- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
-
-### Modularize scripts
-- **Scope**: `productivity/powerpoint`
-- **Severity**: Medium
-- **Description**: `productivity/powerpoint` has 44 script files.
-- **Action**: Group related scripts into sub-packages or a scripts library. Consider whether all scripts serve a single executable purpose.
-
-### Convert to executable skill
-- **Scope**: `mlops/huggingface-hub`
-- **Severity**: Low
-- **Description**: `mlops/huggingface-hub` is classified as Reference Material with low complexity.
-- **Action**: Define clear inputs, outputs, and procedures to make this an executable skill.
-
-### Convert to executable skill
-- **Scope**: `productivity/airtable`
-- **Severity**: Low
-- **Description**: `productivity/airtable` is classified as Reference Material with low complexity.
-- **Action**: Define clear inputs, outputs, and procedures to make this an executable skill.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `devops` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `dogfood` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `governance` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `red-teaming` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `software-development` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
-
-### Add category description
-- **Scope**: `[library-wide]`
-- **Severity**: Low
-- **Description**: `yuanbao` has no DESCRIPTION.md.
-- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+- Medium: 5
+- Low: 7
 
 ## Highest Risk Packages
 
@@ -253,51 +193,36 @@ Utilization Rate: 5.7%
 | 2 | `research/research-paper-writing` | research | 60 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
 | 3 | `productivity/powerpoint` | productivity | 62 / 100 | 135 | High complexity (135); Script bloat (44 scripts) |
 | 4 | `creative/comfyui` | creative | 71 / 100 | 54 | High complexity (54); Script bloat (11 scripts) |
-| 5 | `creative/baoyu-infographic` | creative | 75 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
-| 6 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
+| 5 | `creative/touchdesigner-mcp` | creative | 72 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
+| 6 | `creative/baoyu-infographic` | creative | 73 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
 | 7 | `creative/p5js` | creative | 90 / 100 | 25 | High complexity (25) |
 | 8 | `mlops/huggingface-hub` | mlops | 91 / 100 | 0 | - |
-| 9 | `productivity/airtable` | productivity | 91 / 100 | 0 | - |
+| 9 | `creative/humanizer` | creative | 93 / 100 | 1 | - |
 | 10 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
-
-## Unused High-Cost Skills
-
-| Skill | Category | Complexity | References | Templates | Scripts |
-| ----- | -------- | ----------: | ----------: | ---------: | --------: |
-| `productivity/powerpoint` | productivity | 135 | 0 | 0 | 44 |
-| `creative/popular-web-designs` | creative | 108 | 0 | 54 | 0 |
-| `research/research-paper-writing` | research | 99 | 9 | 45 | 0 |
-| `creative/comfyui` | creative | 54 | 4 | 0 | 11 |
-| `creative/baoyu-infographic` | creative | 46 | 45 | 0 | 0 |
-| `creative/p5js` | creative | 25 | 10 | 1 | 4 |
-| `creative/touchdesigner-mcp` | creative | 24 | 21 | 0 | 1 |
-| `creative/manim-video` | creative | 18 | 14 | 0 | 1 |
-| `red-teaming/godmode` | red-teaming | 18 | 2 | 2 | 4 |
-| `productivity/google-workspace` | productivity | 13 | 1 | 0 | 4 |
 
 ## Most Valuable Packages
 
-| Rank | Package | Category | Health | Value Score |
-|---:|---|---|---:|---:|
-| 1 | `creative/baoyu-infographic` | creative | 75 / 100 | 129 |
-| 2 | `research/research-paper-writing` | research | 60 / 100 | 120 |
-| 3 | `productivity/powerpoint` | productivity | 62 / 100 | 118 |
-| 4 | `creative/comfyui` | creative | 71 / 100 | 97 |
-| 5 | `creative/popular-web-designs` | creative | 46 / 100 | 86 |
-| 6 | `creative/p5js` | creative | 90 / 100 | 79 |
-| 7 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 79 |
-| 8 | `creative/manim-video` | creative | 93 / 100 | 75 |
-| 9 | `red-teaming/godmode` | red-teaming | 98 / 100 | 64 |
-| 10 | `creative/ascii-video` | creative | 99 / 100 | 58 |
+| Rank | Package | Category | Health | Value Score | Drivers |
+|---:|---|---|---:|---:|---|
+| 1 | `research/research-paper-writing` | research | 60 / 100 | 120 | 9 references, high template density, workflow |
+| 2 | `productivity/powerpoint` | productivity | 62 / 100 | 118 | script-heavy, executable skill |
+| 3 | `creative/baoyu-infographic` | creative | 73 / 100 | 117 | 45 references, workflow, good health |
+| 4 | `creative/comfyui` | creative | 71 / 100 | 97 | 4 references, script-heavy, executable skill, good health |
+| 5 | `creative/popular-web-designs` | creative | 46 / 100 | 86 | high template density, health penalty |
+| 6 | `creative/p5js` | creative | 90 / 100 | 79 | 10 references, 1 templates, executable skill, good health |
+| 7 | `creative/manim-video` | creative | 93 / 100 | 75 | 14 references, executable skill, good health |
+| 8 | `red-teaming/godmode` | red-teaming | 98 / 100 | 64 | 2 references, 2 templates, executable skill, good health |
+| 9 | `productivity/google-workspace` | productivity | 98 / 100 | 53 | 1 references, executable skill, good health |
+| 10 | `creative/ascii-video` | creative | 97 / 100 | 46 | 8 references, workflow, good health |
 
 ---
 
 ## Package Type Distribution
 
-- **Knowledge**: 5 (7%)
-- **Workflow**: 9 (13%)
-- **Executable Skill**: 53 (76%)
-- **Reference Material**: 3 (4%)
+- **Knowledge**: 8 (11%)
+- **Workflow**: 15 (21%)
+- **Executable Skill**: 45 (64%)
+- **Reference Material**: 2 (3%)
 
 ## Asset Distribution
 
@@ -324,9 +249,9 @@ description: Skills for spawning and orchestrating autonomous AI coding agents a
 description: Creative content generation — ASCII art, hand-drawn style diagrams, and visual design tools.
 ---*
 - **17** skill packages
-  - Knowledge: 2
-  - Workflow: 1
-  - Executable Skill: 13
+  - Knowledge: 4
+  - Workflow: 4
+  - Executable Skill: 8
   - Reference Material: 1
 ### data-science
 *---
@@ -352,8 +277,8 @@ description: Skills for sending, receiving, searching, and managing email from t
 description: GitHub workflow skills for managing repositories, pull requests, code reviews, issues, and CI/CD pipelines using the gh CLI and git via terminal.
 ---*
 - **6** skill packages
-  - Workflow: 1
-  - Executable Skill: 5
+  - Workflow: 2
+  - Executable Skill: 4
 ### governance
 - **1** skill packages
   - Executable Skill: 1
@@ -362,7 +287,8 @@ description: GitHub workflow skills for managing repositories, pull requests, co
 description: Skills for working with media content — YouTube transcripts, GIF search, music generation, and audio visualization.
 ---*
 - **4** skill packages
-  - Executable Skill: 4
+  - Workflow: 1
+  - Executable Skill: 3
 ### mlops
 *---
 description: Knowledge and Tools for Machine Learning Operations - tools and frameworks for training, fine-tuning, deploying, and optimizing ML/AI models
@@ -374,14 +300,13 @@ description: Knowledge and Tools for Machine Learning Operations - tools and fra
 description: Note taking skills, to save information, assist with research, and collab on multi-session planning and information sharing.
 ---*
 - **1** skill packages
-  - Workflow: 1
+  - Knowledge: 1
 ### productivity
 *---
 description: Skills for document creation, presentations, spreadsheets, and other productivity workflows.
 ---*
 - **8** skill packages
-  - Executable Skill: 7
-  - Reference Material: 1
+  - Executable Skill: 8
 ### red-teaming
 - **1** skill packages
   - Executable Skill: 1
@@ -407,8 +332,8 @@ description: Skills for interacting with social platforms and social-media workf
 ### software-development
 - **9** skill packages
   - Knowledge: 1
-  - Workflow: 2
-  - Executable Skill: 6
+  - Workflow: 4
+  - Executable Skill: 4
 ### yuanbao
 - **1** skill packages
   - Executable Skill: 1
