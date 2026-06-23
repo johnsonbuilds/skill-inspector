@@ -11,7 +11,6 @@ from .llm import EmbeddingClient, LLMClassifier
 from .package_classifier import PackageClassifier
 from .package_duplicates import PackageDuplicateDetector
 from .package_report import PackageReportGenerator
-from .report import ReportGenerator
 
 
 def build_parser() -> argparse.ArgumentParser:

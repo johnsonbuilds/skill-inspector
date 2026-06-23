@@ -13,7 +13,7 @@ from .models import (
 from .health_scoring import PackageHealthResult, score_package
 from .risk_analysis import RiskAnalysis, detect_risks
 from .recommendations import Recommendation, generate_recommendations
-from .usage_analysis import UsageAnalysis, analyze_usage, load_usage_data
+from .usage_analysis import UsageAnalysis, UsageRecord, analyze_usage, load_usage_data
 
 
 class PackageReportGenerator:
@@ -29,8 +29,9 @@ class PackageReportGenerator:
         # Gather stats
         total_categories = len(categories)
         total_packages = sum(cat.package_count for cat in categories)
+        all_pkgs = [pkg for cat in categories for pkg in cat.packages]
         total_assets = sum(
-            pkg.total_asset_count for cat in categories for pkg in cat.packages
+            pkg.total_asset_count for pkg in all_pkgs
         )
 
         # Classification counts
@@ -38,13 +39,10 @@ class PackageReportGenerator:
         type_counts = Counter(pc.type for pc in pkg_classes)
 
         # Asset distribution totals
-        total_references = sum(pkg.references_count for cat in categories for pkg in cat.packages)
-        total_templates = sum(pkg.templates_count for cat in categories for pkg in cat.packages)
-        total_scripts = sum(pkg.scripts_count for cat in categories for pkg in cat.packages)
-        total_assets_extras = sum(pkg.assets_count for cat in categories for pkg in cat.packages)
-
-        # Category ranking (descending by package count)
-        cat_ranking = sorted(categories, key=lambda c: c.package_count, reverse=True)
+        total_references = sum(pkg.references_count for pkg in all_pkgs)
+        total_templates = sum(pkg.templates_count for pkg in all_pkgs)
+        total_scripts = sum(pkg.scripts_count for pkg in all_pkgs)
+        total_assets_extras = sum(pkg.assets_count for pkg in all_pkgs)
 
         # Compute health scores for all packages
         health_results: dict[str, PackageHealthResult] = {}
@@ -64,7 +62,6 @@ class PackageReportGenerator:
 
         # --- Runtime usage analysis (v0.4) ---
         usage_records = load_usage_data()
-        all_pkgs = [pkg for cat in categories for pkg in cat.packages]
         usage_analysis = analyze_usage(usage_records, all_pkgs, categories)
 
         # Generate utilization-based recommendations
@@ -76,6 +73,15 @@ class PackageReportGenerator:
             categories, health_results, risk_analysis, type_counts, total_packages,
         )
 
+        # Match usage to packages
+        from .usage_analysis import match_usage_to_packages
+        matched_usage = match_usage_to_packages(usage_records, [p.id for p in all_pkgs])
+
+        # Governance summary
+        governance_summary = self._build_governance_summary(
+            categories, health_results, risk_analysis, type_counts, total_packages, usage_analysis, duplicate_clusters,
+        )
+
         # Category breakdown
         cat_breakdown: list[str] = []
         for cat in categories:
@@ -83,15 +89,15 @@ class PackageReportGenerator:
             cat_types = Counter(
                 classifications[p.id].type.value for p in cat_pkgs if p.id in classifications
             )
-            lines = [f"### {cat.name}"]
+            lines_cb = [f"### {cat.name}"]
             if cat.description:
-                lines.append(f"*{cat.description[:200]}*" if len(cat.description) > 200 else f"*{cat.description}*")
-            lines.append(f"- **{len(cat_pkgs)}** skill packages")
+                lines_cb.append(f"*{cat.description[:200]}*" if len(cat.description) > 200 else f"*{cat.description}*")
+            lines_cb.append(f"- **{len(cat_pkgs)}** skill packages")
             for t in AssetType:
                 count = cat_types.get(t.value, 0)
                 if count:
-                    lines.append(f"  - {t.value}: {count}")
-            cat_breakdown.append("\n".join(lines))
+                    lines_cb.append(f"  - {t.value}: {count}")
+            cat_breakdown.append("\n".join(lines_cb))
 
         # Package type distribution (based ONLY on SKILL.md classification)
         type_dist_lines: list[str] = []
@@ -101,37 +107,13 @@ class PackageReportGenerator:
                 pct = count / max(total_packages, 1) * 100
                 type_dist_lines.append(f"- **{t.value}**: {count} ({pct:.0f}%)")
 
-        # All packages for sorting
-        all_packages: list[tuple[Category, PackageClassification | None, SkillPackage]] = []
-        for cat in categories:
-            for pkg in cat.packages:
-                pc = classifications.get(pkg.id)
-                all_packages.append((cat, pc, pkg))
-
-        # Largest packages by total_asset_count
-        largest = sorted(all_packages, key=lambda x: x[2].total_asset_count, reverse=True)[:10]
-
-        # Most complex packages by complexity_score
-        complex_pkgs = sorted(
-            all_packages,
-            key=lambda x: x[2].complexity_score,
-            reverse=True,
-        )[:10]
-
-        # Healthiest packages
-        healthiest = sorted(
-            health_results.values(),
-            key=lambda h: h.overall,
-            reverse=True,
-        )[:10]
-
         # Highest risk packages
         highest_risk = sorted(
             health_results.values(),
             key=lambda h: h.overall,
         )[:10]
 
-        # Most valuable packages: Executable + Supporting Assets + Complexity - Risk
+        # Most valuable packages
         def value_score(hr: PackageHealthResult) -> int:
             pkg = None
             for cat in categories:
@@ -160,6 +142,15 @@ class PackageReportGenerator:
             reverse=True,
         )[:10]
 
+        # Unused High-Cost Skills
+        unused_pkgs = []
+        for pkg in all_pkgs:
+            rec = matched_usage.get(pkg.id)
+            is_used = rec and (rec.use_count > 0 or rec.view_count > 0)
+            if not is_used:
+                unused_pkgs.append(pkg)
+        unused_high_cost = sorted(unused_pkgs, key=lambda p: p.complexity_score, reverse=True)
+
         # Duplicate clusters
         dup_lines: list[str] = []
         if duplicate_clusters:
@@ -174,11 +165,6 @@ class PackageReportGenerator:
         else:
             dup_lines.append("No duplicate skill packages detected.")
 
-        # Governance summary
-        governance_summary = self._build_governance_summary(
-            categories, health_results, risk_analysis, type_counts, total_packages,
-        )
-
         # Build report
         lines = [
             "# Skill Inspector Report (Package-Aware)",
@@ -190,8 +176,13 @@ class PackageReportGenerator:
             f"- **Total Assets**: {total_assets}",
             f"- **Duplicate Clusters**: {len(duplicate_clusters)}",
             "",
-        ] + _build_utilization_section(usage_analysis) + [
-            "",
+        ]
+
+        # 2. Skill Utilization Summary
+        lines += self._build_utilization_summary(usage_analysis)
+
+        # 3. Library Health Score
+        lines += [
             "## Library Health Score",
             "",
             f"**Overall Health: {library_health['overall']} / 100**",
@@ -201,67 +192,33 @@ class PackageReportGenerator:
             f"- **Reusability**: {library_health['reusability']} / 25",
             f"- **Duplication**: {library_health['duplication']} / 25",
             "",
-            "## Asset Distribution",
-            "",
-            f"- **References**: {total_references}",
-            f"- **Templates**: {total_templates}",
-            f"- **Scripts**: {total_scripts}",
-            f"- **Assets**: {total_assets_extras}",
-            "",
-            "## Package Type Distribution",
-            "",
-        ] + type_dist_lines + [
-            "",
-            "## Top Categories",
-            "",
-        ] + [f"- **{cat.name}**: {cat.package_count} packages" for cat in cat_ranking] + [
-            "",
-            "## Category Breakdown",
-            "",
-        ] + cat_breakdown + [
-            "",
-            "## Largest Packages",
-            "",
-            "| Rank | Package | Category | References | Templates | Scripts | Assets | Complexity |",
-            "|---:|---|---|---:|---:|---:|---:|---:|",
         ]
-        for rank, (cat, pc, pkg) in enumerate(largest, 1):
-            lines.append(
-                f"| {rank} | `{pkg.id}` | {cat.name} "
-                f"| {pkg.references_count} | {pkg.templates_count} "
-                f"| {pkg.scripts_count} | {pkg.assets_count} "
-                f"| {pkg.complexity_score} |"
-            )
 
-        lines += [
-            "",
-            "## Most Complex Packages",
-            "",
-            "| Rank | Package | Category | Complexity | References | Templates | Scripts | Assets |",
-            "|---:|---|---|---:|---:|---:|---:|---:|",
-        ]
-        for rank, (cat, pc, pkg) in enumerate(complex_pkgs[:10], 1):
-            type_str = pc.type.value if pc else "?"
-            lines.append(
-                f"| {rank} | `{pkg.id}` | {cat.name} | {pkg.complexity_score} "
-                f"| {pkg.references_count} | {pkg.templates_count} "
-                f"| {pkg.scripts_count} | {pkg.assets_count} |"
-            )
+        # 4. Governance Summary
+        lines += governance_summary
 
-        # Healthiest packages
-        lines += [
-            "",
-            "## Healthiest Packages",
-            "",
-            "| Rank | Package | Category | Health |",
-            "|---:|---|---|---:|",
-        ]
-        for rank, hr in enumerate(healthiest, 1):
-            lines.append(f"| {rank} | `{hr.package_id}` | {hr.category} | {hr.overall} / 100 |")
+        # 5. Runtime Governance
+        lines += self._build_runtime_governance(usage_analysis, matched_usage)
 
-        # Highest risk packages
+        # 6. Governance Recommendations
+        if recommendations:
+            lines += [
+                "## Governance Recommendations",
+                "",
+            ]
+            sev_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+            sorted_recs = sorted(recommendations, key=lambda r: sev_order.get(r.severity, 99))
+            for rec in sorted_recs:
+                scope = rec.package_id if rec.package_id else "[library-wide]"
+                lines.append(f"### {rec.title}")
+                lines.append(f"- **Scope**: `{scope}`")
+                lines.append(f"- **Severity**: {rec.severity}")
+                lines.append(f"- **Description**: {rec.description}")
+                lines.append(f"- **Action**: {rec.action}")
+                lines.append("")
+
+        # 7. Highest Risk Packages
         lines += [
-            "",
             "## Highest Risk Packages",
             "",
             "| Rank | Package | Category | Health | Complexity | Risk Factors |",
@@ -278,10 +235,24 @@ class PackageReportGenerator:
                 f"| {rank} | `{hr.package_id}` | {hr.category} "
                 f"| {hr.overall} / 100 | {complexity} | {risk_text} |"
             )
+        lines.append("")
 
-        # Most valuable packages
+        # 8. Unused High-Cost Skills
         lines += [
+            "## Unused High-Cost Skills",
             "",
+            "| Skill | Category | Complexity | References | Templates | Scripts |",
+            "| ----- | -------- | ----------: | ----------: | ---------: | --------: |",
+        ]
+        for pkg in unused_high_cost[:10]:
+            lines.append(
+                f"| `{pkg.id}` | {pkg.category} | {pkg.complexity_score} | "
+                f"{pkg.references_count} | {pkg.templates_count} | {pkg.scripts_count} |"
+            )
+        lines.append("")
+
+        # 9. Most Valuable Packages
+        lines += [
             "## Most Valuable Packages",
             "",
             "| Rank | Package | Category | Health | Value Score |",
@@ -292,83 +263,46 @@ class PackageReportGenerator:
                 f"| {rank} | `{hr.package_id}` | {hr.category} "
                 f"| {hr.overall} / 100 | {value_score(hr)} |"
             )
+        lines.append("")
 
-        # Risk analysis
-        all_risks = risk_analysis.risks + risk_analysis.category_concentrations
-        if all_risks:
-            lines += [
-                "",
-                "## Risk Analysis",
-                "",
-            ]
-            # Group by type
-            risk_groups: dict[str, list] = {}
-            for r in all_risks:
-                risk_groups.setdefault(r.risk_type, []).append(r)
-
-            if "monolithic" in risk_groups:
-                lines.append("### Monolithic Packages")
-                lines.append("")
-                for r in sorted(risk_groups["monolithic"], key=lambda x: int(x.detail.split(": ")[1] if ": " in x.detail else 0), reverse=True):
-                    lines.append(f"- `{r.package_id}` Severity: {r.severity.value} — {r.detail}")
-                lines.append("")
-
-            if "ref_bloat" in risk_groups:
-                lines.append("### Reference Bloat")
-                lines.append("")
-                for r in risk_groups["ref_bloat"]:
-                    lines.append(f"- `{r.package_id}` {r.detail}")
-                lines.append("")
-
-            if "template_bloat" in risk_groups:
-                lines.append("### Template Bloat")
-                lines.append("")
-                for r in risk_groups["template_bloat"]:
-                    lines.append(f"- `{r.package_id}` {r.detail}")
-                lines.append("")
-
-            if "script_bloat" in risk_groups:
-                lines.append("### Script Bloat")
-                lines.append("")
-                for r in risk_groups["script_bloat"]:
-                    lines.append(f"- `{r.package_id}` {r.detail}")
-                lines.append("")
-
-            if "category_concentration" in risk_groups:
-                lines.append("### Category Concentration")
-                lines.append("")
-                for r in risk_groups["category_concentration"]:
-                    lines.append(f"- `{r.package_id}` {r.detail}")
-                lines.append("")
-
-        # Governance recommendations
-        if recommendations:
-            lines += [
-                "",
-                "## Governance Recommendations",
-                "",
-            ]
-            # Sort by severity
-            sev_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
-            sorted_recs = sorted(recommendations, key=lambda r: sev_order.get(r.severity, 99))
-            for rec in sorted_recs:
-                scope = rec.package_id if rec.package_id else "[library-wide]"
-                lines.append(f"### {rec.title}")
-                lines.append(f"- **Scope**: `{scope}`")
-                lines.append(f"- **Severity**: {rec.severity}")
-                lines.append(f"- **Description**: {rec.description}")
-                lines.append(f"- **Action**: {rec.action}")
-                lines.append("")
-
+        # 10. ---
         lines += [
+            "---",
             "",
+        ]
+
+        # 11. Package Type Distribution
+        lines += [
+            "## Package Type Distribution",
+            "",
+        ] + type_dist_lines + [
+            "",
+        ]
+
+        # 12. Asset Distribution
+        lines += [
+            "## Asset Distribution",
+            "",
+            f"- **References**: {total_references}",
+            f"- **Templates**: {total_templates}",
+            f"- **Scripts**: {total_scripts}",
+            f"- **Assets**: {total_assets_extras}",
+            "",
+        ]
+
+        # 13. Category Breakdown
+        lines += [
+            "## Category Breakdown",
+            "",
+        ] + cat_breakdown + [
+            "",
+        ]
+
+        # 14. Duplicate Skill Packages
+        lines += [
             "## Duplicate Skill Packages",
             "",
-        ] + dup_lines + [
-            "",
-            "## Governance Summary",
-            "",
-        ] + governance_summary
+        ] + dup_lines
 
         text = "\n".join(lines) + "\n"
         output.write_text(text, encoding="utf-8")
@@ -475,73 +409,157 @@ class PackageReportGenerator:
         risk_analysis: RiskAnalysis,
         type_counts: Counter,
         total_packages: int,
+        usage: UsageAnalysis,
+        duplicate_clusters: list[PackageDuplicateCluster],
     ) -> list[str]:
-        """Build the Governance Summary section."""
-        lines: list[str] = []
+        """Build the Governance Summary section (v0.4.1)."""
+        lines = [
+            "## Governance Summary",
+            "",
+        ]
 
         # Compute library health
         health = self._compute_library_health(
             categories, health_results, risk_analysis, type_counts, total_packages,
         )
-        lines.append(f"**Library Health: {health['overall']} / 100**")
+        overall_health = health["overall"]
+
+        # Health score bullet
+        if overall_health < 70:
+            lines.append("• Health score is below recommended level.")
+        else:
+            lines.append("• Health score is at or above recommended level.")
+
+        # Utilization / Unused bullets
+        has_data = usage.installed_skills > 0 or usage.used_skills > 0
+        if has_data:
+            lines.append(f"• Only {usage.utilization_rate}% of installed skills have been used.")
+            lines.append(f"• {usage.unused_skills} skills have never been used.")
+        else:
+            lines.append("• No usage data available to evaluate skill utilization.")
+
+        # Large unused packages representing overhead
+        all_packages = [pkg for cat in categories for pkg in cat.packages]
+        usage_records = load_usage_data()
+        from .usage_analysis import match_usage_to_packages
+        matched = match_usage_to_packages(usage_records, [p.id for p in all_packages])
+        large_unused = 0
+        for pkg in all_packages:
+            rec = matched.get(pkg.id)
+            is_used = rec and (rec.use_count > 0 or rec.view_count > 0)
+            if not is_used and pkg.complexity_score > 10:
+                large_unused += 1
+
+        if large_unused > 0:
+            lines.append("• Several large unused packages represent maintenance overhead.")
+        else:
+            lines.append("• Unused packages do not represent significant complexity overhead.")
+
+        # Duplicate risk bullet
+        if duplicate_clusters:
+            lines.append(f"• Duplicate package risk is elevated ({len(duplicate_clusters)} clusters detected).")
+        else:
+            lines.append("• Duplicate package risk remains low.")
+
+        lines.append("")
+        return lines
+
+    def _build_utilization_summary(self, usage: UsageAnalysis) -> list[str]:
+        """Build the Skill Utilization Summary section (v0.4.1)."""
+        lines = [
+            "## Skill Utilization Summary",
+            "",
+        ]
+        has_data = usage.installed_skills > 0 or usage.used_skills > 0
+        if not has_data:
+            lines.append("*No usage data available. Runtime governance analysis skipped.*")
+            lines.append("")
+            return lines
+
+        lines.append(f"Installed Skills: {usage.installed_skills}")
+        lines.append("")
+        lines.append(f"Used Skills: {usage.used_skills}")
+        lines.append("")
+        lines.append(f"Unused Skills: {usage.unused_skills}")
+        lines.append("")
+        lines.append(f"Utilization Rate: {usage.utilization_rate}%")
+        lines.append("")
+        return lines
+
+    def _build_runtime_governance(
+        self,
+        usage: UsageAnalysis,
+        matched_usage: dict[str, UsageRecord | None],
+    ) -> list[str]:
+        """Build the Runtime Governance section (v0.4.1)."""
+        lines = [
+            "## Runtime Governance",
+            "",
+        ]
+        has_data = usage.installed_skills > 0 or usage.used_skills > 0
+        if not has_data:
+            lines.append("*No usage data available. Runtime governance analysis skipped.*")
+            lines.append("")
+            return lines
+
+        # Most Used Skills
+        # Display: | Skill | Uses | Views | Last Used |
+        # Sort: use_count DESC
+        used_pkgs = []
+        for pkg_id, record in matched_usage.items():
+            if record and (record.use_count > 0 or record.view_count > 0):
+                used_pkgs.append((pkg_id, record))
+
+        most_used_pkgs = sorted(used_pkgs, key=lambda x: x[1].use_count, reverse=True)
+
+        lines.append("### Most Used Skills")
+        lines.append("")
+        lines.append("| Skill | Uses | Views | Last Used |")
+        lines.append("| ----- | ---: | ----: | --------- |")
+        for pkg_id, record in most_used_pkgs:
+            last_used = record.last_used_at[:10] if record.last_used_at else "N/A"
+            lines.append(f"| `{pkg_id}` | {record.use_count} | {record.view_count} | {last_used} |")
         lines.append("")
 
-        # Strengths
-        strengths: list[str] = []
-        if total_packages > 0:
-            max_cat_ratio = max(c.package_count for c in categories) / total_packages
-            if max_cat_ratio <= 0.25:
-                strengths.append("Strong category diversity")
-            elif max_cat_ratio <= 0.30:
-                strengths.append("Acceptable category distribution")
+        # Recently Used Skills
+        # Display: | Skill | Last Used |
+        # Sort: last_used_at DESC
+        recently_used_pkgs = [p for p in used_pkgs if p[1].last_used_at]
+        recently_used_pkgs.sort(key=lambda x: x[1].last_used_at, reverse=True)
 
-            exec_ratio = type_counts.get(AssetType.EXECUTABLE_SKILL, 0) / total_packages
-            if exec_ratio > 0.3:
-                strengths.append("Large executable skill inventory")
-            elif exec_ratio > 0.1:
-                strengths.append("Moderate executable skill coverage")
+        lines.append("### Recently Used Skills")
+        lines.append("")
+        lines.append("| Skill | Last Used |")
+        lines.append("| ----- | --------- |")
+        for pkg_id, record in recently_used_pkgs:
+            last_used = record.last_used_at[:10] if record.last_used_at else "N/A"
+            lines.append(f"| `{pkg_id}` | {last_used} |")
+        lines.append("")
 
-            workflow_ratio = type_counts.get(AssetType.WORKFLOW, 0) / total_packages
-            if workflow_ratio > 0.2:
-                strengths.append("Good workflow package coverage")
+        # Never Used Skills
+        # Display: | Skill | Category |
+        # Limit display: Top 20 entries
+        # Show total count.
+        lines.append("### Never Used Skills")
+        lines.append("")
+        lines.append(f"{usage.unused_skills} skills have never been used.")
+        lines.append("")
+        lines.append("| Skill | Category |")
+        lines.append("| ----- | -------- |")
+        for pkg_id, category in usage.never_used[:20]:
+            lines.append(f"| `{pkg_id}` | {category} |")
+        lines.append("")
 
-            if not risk_analysis.risks:
-                strengths.append("No oversized packages detected")
-
-        avg_health = sum(h.overall for h in health_results.values()) / len(health_results) if health_results else 0
-        if avg_health >= 70:
-            strengths.append("Good overall package health")
-        elif avg_health >= 50:
-            strengths.append("Moderate package health")
-
-        if strengths:
-            lines.append("**Strengths**")
-            for s in strengths:
-                lines.append(f"✓ {s}")
-
-        # Risks
-        risks: list[str] = []
-        if risk_analysis.risks:
-            critical_count = sum(1 for r in risk_analysis.risks if r.severity.value in ("High", "Critical"))
-            if critical_count > 0:
-                risks.append(f"{critical_count} oversized or bloated packages")
-            ref_bloat = [r for r in risk_analysis.risks if r.risk_type == "ref_bloat"]
-            tmpl_bloat = [r for r in risk_analysis.risks if r.risk_type == "template_bloat"]
-            if ref_bloat:
-                risks.append("Reference bloat in some packages")
-            if tmpl_bloat:
-                risks.append("Template concentration detected")
-
-        for cc in risk_analysis.category_concentrations:
-            risks.append(f"Category concentration: {cc.detail}")
-
-        if not risk_analysis.risks and not risk_analysis.category_concentrations:
-            pass  # no risks
-        elif risks:
-            lines.append("")
-            lines.append("**Risks**")
-            for r in risks:
-                lines.append(f"⚠ {r}")
+        # Category Utilization
+        # Display: | Category | Utilization | Used / Total |
+        # Sort: utilization DESC
+        lines.append("### Category Utilization")
+        lines.append("")
+        lines.append("| Category | Utilization | Used / Total |")
+        lines.append("| -------- | ----------: | ------------ |")
+        for cat_name, pct, used, total in usage.category_utilization:
+            lines.append(f"| {cat_name} | {pct}% | {used} / {total} |")
+        lines.append("")
 
         return lines
 
@@ -568,82 +586,10 @@ def value_score(hr, categories):
     return hr.overall
 
 
-def _build_utilization_section(usage: UsageAnalysis) -> list[str]:
-    """Build the Skill Utilization section for the report (v0.4)."""
-    lines: list[str] = [
-        "## Skill Utilization",
-        "",
-    ]
-
-    # Check if usage data is available
-    has_data = usage.installed_skills > 0 or usage.used_skills > 0
-
-    if not has_data:
-        lines.append("*No usage data available. Runtime governance analysis skipped.*")
-        lines.append("")
-        return lines
-
-    lines.append(f"**Installed Skills**: {usage.installed_skills}")
-    lines.append("")
-    lines.append(f"**Used Skills**: {usage.used_skills}")
-    lines.append("")
-    lines.append(f"**Unused Skills**: {usage.unused_skills}")
-    lines.append("")
-    lines.append(f"**Utilization Rate**: {usage.utilization_rate}%")
-    lines.append("")
-
-    # Most Used Skills
-    if usage.most_used:
-        lines.append("### Most Used Skills")
-        lines.append("")
-        lines.append("| Skill | Uses |")
-        lines.append("|---|---:|")
-        for skill_id, use_count in usage.most_used:
-            lines.append(f"| `{skill_id}` | {use_count} |")
-        lines.append("")
-
-    # Recently Used Skills
-    if usage.recently_used:
-        lines.append("### Recently Used Skills")
-        lines.append("")
-        lines.append("| Skill | Last Used |")
-        lines.append("|---|---|")
-        for skill_id, last_date in usage.recently_used:
-            date_str = last_date if last_date else "N/A"
-            lines.append(f"| `{skill_id}` | {date_str} |")
-        lines.append("")
-
-    # Never Used Skills (limited to 20)
-    if usage.never_used:
-        lines.append("### Never Used Skills")
-        lines.append("")
-        lines.append(f"*{usage.unused_skills} skills have never been used.*")
-        lines.append("")
-        lines.append("| Skill | Category |")
-        lines.append("|---|---|")
-        for skill_id, category in usage.never_used:
-            lines.append(f"| `{skill_id}` | {category} |")
-        if usage.unused_skills > 20:
-            lines.append(f"\n*... and {usage.unused_skills - 20} more*")
-        lines.append("")
-
-    # Category Utilization
-    if usage.category_utilization:
-        lines.append("### Category Utilization")
-        lines.append("")
-        lines.append("| Category | Utilization | Used / Total |")
-        lines.append("|---|---:|---:|")
-        for cat_name, pct, used, total in usage.category_utilization:
-            lines.append(f"| {cat_name} | {pct}% | {used} / {total} |")
-        lines.append("")
-
-    return lines
-
-
 def _generate_utilization_recommendations(
     usage: UsageAnalysis, total_packages: int,
 ) -> list[Recommendation]:
-    """Generate utilization-based governance recommendations (v0.4)."""
+    """Generate utilization-based governance recommendations (v0.4.1)."""
     recs: list[Recommendation] = []
 
     if usage.installed_skills == 0:
@@ -657,11 +603,10 @@ def _generate_utilization_recommendations(
             severity="Medium" if usage.unused_skills < 50 else "High",
             title="Review unused skills for archival",
             description=(
-                f"{usage.unused_skills} skills have never been used. "
-                f"({usage.utilization_rate}% utilization rate)"
+                f"Only {usage.utilization_rate}% of installed skills are actively used. "
+                f"{usage.unused_skills} skills have never been used."
             ),
-            action="Consider archiving unused skills to reduce library bloat. "
-                   "Unused skills consume memory and increase classification overhead.",
+            action="Consider archiving or removing unused skills. Review large unused packages before adding new skills.",
         ))
 
     # Low utilization rate
@@ -678,20 +623,5 @@ def _generate_utilization_recommendations(
             action="Review the unused skills list and consider removing or archiving "
                    "skills that are no longer relevant to your workflow.",
         ))
-
-    # Category with 0% utilization
-    for cat_name, pct, used, total in usage.category_utilization:
-        if pct == 0 and total > 0:
-            recs.append(Recommendation(
-                package_id=None,
-                category=cat_name,
-                severity="Low",
-                title=f"Category '{cat_name}' has 0% utilization",
-                description=(
-                    f"All {total} skills in the '{cat_name}' category have never been used."
-                ),
-                action="Review whether these skills are still relevant to the current environment. "
-                       "Consider archiving the entire category if unused.",
-            ))
 
     return recs

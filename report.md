@@ -1,423 +1,418 @@
-# Skill Inspector Report
+# Skill Inspector Report (Package-Aware)
 
 ## Summary
 
-Total assets: 351
+- **Total Categories**: 19
+- **Total Skill Packages**: 70
+- **Total Assets**: 415
+- **Duplicate Clusters**: 0
 
-- Knowledge: 54
-- Workflow: 17
-- Executable Skill: 89
-- Preference: 0
-- Reference Material: 183
-- Unknown: 8
+## Skill Utilization Summary
 
-## Classification Table
+Installed Skills: 70
 
-| Asset | Type | Confidence | Reason |
-|---|---:|---:|---|
-| apple-notes | Executable Skill | 0.95 | The asset defines a specific capability ('Manage Apple Notes') with clear prerequisites, usage conditions, and executable command references, fitting the definition of a skill that performs a task. |
-| apple-reminders | Executable Skill | 0.95 | The asset defines a specific capability (managing Apple Reminders via CLI) with clear triggers, prerequisites, and execution steps, fitting the definition of an executable skill. |
-| findmy | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides concrete, executable commands (AppleScript, peekaboo, screencapture) to perform a specific task (tracking devices) with clear inputs and outputs. |
-| imessage | Executable Skill | 0.95 | The asset defines a specific capability ('imessage') with clear prerequisites, usage conditions, and command-line examples for performing tasks like sending and reading messages. |
-| macos-computer-use | Executable Skill | 0.95 | The file is named SKILL.md and describes a set of actionable instructions and tool usage patterns (computer_use) for performing specific tasks like clicking, typing, and capturing screens on macOS. |
-| codex | Executable Skill | 0.95 | The document defines a specific skill ('codex') with instructions on how to delegate coding tasks using the OpenAI Codex CLI, including prerequisites, usage patterns, and operational rules. |
-| cloud-browser-infrastructure | Reference Material | 0.95 | The document serves as a curated collection of external tools, services, and their specific details (pricing, features, use cases) for future lookup and decision-making. |
-| native-mcp | Reference Material | 0.95 | The content is a technical documentation file describing the configuration, usage, and internal mechanics of the 'native-mcp' feature within the Hermes Agent system. |
-| webhooks | Reference Material | 0.95 | This document serves as technical documentation and a reference guide for configuring and using the webhooks feature within the Hermes agent system, containing setup instructions, command syntax, and usage examples. |
-| opencode | Executable Skill | 0.95 | The asset defines a specific capability ('Delegate coding to OpenCode CLI') with clear instructions on when to use it, prerequisites, and step-by-step procedures for executing tasks. It functions as a directive for an agent to perform a concrete action using a specific tool. |
-| architecture-diagram | Executable Skill | 0.95 | The asset is explicitly defined as a 'Skill' with a structured workflow to generate specific output (HTML/SVG diagrams) based on user input, fitting the definition of an executable task. |
-| ascii-art | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured decision flow and specific command-line instructions to directly perform tasks such as generating ASCII art, banners, and converting images. |
-| README | Knowledge | 0.95 | The content provides detailed factual descriptions, technical specifications, and strategic guidance on how the ASCII video skill functions, including its pipeline, components, and design patterns. |
-| ascii-video | Executable Skill | 0.95 | The asset defines a specific capability ('ascii-video') with clear inputs (video/audio files) and outputs (ASCII MP4/GIF), including a technical stack and pipeline architecture for direct execution. |
-| troubleshooting | Reference Material | 0.90 | The document serves as a static reference guide containing diagnostic tables, code snippets, and explanations of known issues and pitfalls for future lookup. |
-| PORT_NOTES | Reference Material | 0.90 | The content documents changes, preservation details, and syncing procedures for a ported project, serving as external informational reference rather than a direct skill or workflow. |
-| baoyu-infographic | Executable Skill | 0.95 | The asset defines a specific, automated workflow with clear inputs (content/topic) and outputs (infographic image and analysis files), triggered by user intent to generate visual summaries. |
-| analysis-framework | Workflow | 0.95 | The asset provides a structured, repeatable process (Analysis Framework) with specific steps, dimensions, and checklists for analyzing content before creating an infographic. |
-| base-prompt | Workflow | 0.90 | The content defines a structured, repeatable process and set of guidelines for creating infographics, including specific steps for layout, style, and text requirements. |
-| bento-grid | Reference Material | 0.90 | The content describes a specific design pattern (bento-grid) including its structure, best use cases, and visual elements, serving as a reference guide for designers rather than a step-by-step workflow or executable code. |
-| binary-comparison | Reference Material | 0.90 | The content describes a specific design layout template ('binary-comparison') including its structure, variants, and visual elements, serving as external reference information for infographic creation. |
-| bridge | Reference Material | 0.90 | The content provides structured definitions, visual guidelines, and best practices for a specific infographic layout ('bridge'), serving as reference material for design rather than a direct executable skill or general knowledge fact. |
-| circular-flow | Reference Material | 0.90 | The content provides structured guidelines, visual elements, and pairing recommendations for a specific infographic layout type, serving as reference material for design decisions. |
-| comic-strip | Reference Material | 0.90 | The asset provides descriptive information, structural guidelines, and best practices for a specific visual layout style, serving as a reference for design decisions rather than a direct executable skill or a step-by-step workflow. |
-| comparison-matrix | Reference Material | 0.90 | The content provides structured external information and guidelines regarding a specific layout pattern (comparison matrix) for future reference and application. |
-| dashboard | Knowledge | 0.90 | The content provides factual descriptions, structural guidelines, and best practices for designing dashboards, which constitutes domain knowledge rather than a step-by-step workflow or executable code. |
-| dense-modules | Reference Material | 0.90 | The content serves as a detailed design specification and style guide for a specific layout pattern, providing structural definitions, archetypes, and visual rules for future reference. |
-| funnel | Knowledge | 0.90 | The content provides factual definitions, structural guidelines, best practices, and design recommendations for creating funnel infographics, which constitutes strategic knowledge rather than a repeatable workflow or executable code. |
-| hierarchical-layers | Reference Material | 0.90 | The content provides structured definitions, variants, and best practices for a specific design layout concept, serving as external information stored for reference during infographic creation. |
-| hub-spoke | Reference Material | 0.90 | The asset contains structured guidelines, best practices, and visual recommendations for a specific infographic layout, serving as a reference for design decisions rather than a direct executable skill or simple fact. |
-| iceberg | Reference Material | 0.90 | The asset provides structured guidelines, visual elements, and pairing recommendations for a specific infographic layout concept, serving as external reference material for design execution. |
-| isometric-map | Reference Material | 0.90 | The content provides descriptive specifications, visual guidelines, and pairing recommendations for a design layout, serving as external reference information rather than a direct executable skill or procedural workflow. |
-| jigsaw | Reference Material | 0.90 | The content describes a specific visual layout concept ('jigsaw') including its structure, best use cases, and visual elements, serving as a reference guide for design rather than a direct executable skill or general knowledge fact. |
-| linear-progression | Reference Material | 0.90 | The content describes a specific layout pattern ('linear-progression') including its structure, variants, and visual elements, serving as a reference guide for design rather than a direct executable skill or general knowledge fact. |
-| periodic-table | Reference Material | 0.90 | The content describes a visual layout pattern and its structural components, serving as a reference guide for design rather than executable code or a procedural workflow. |
-| story-mountain | Reference Material | 0.90 | The asset provides descriptive specifications and visual guidelines for a layout template, serving as reference material for design rather than executable code or a procedural workflow. |
-| structural-breakdown | Knowledge | 0.95 | The content provides factual definitions, structural characteristics, variants, and usage guidelines for a specific infographic layout type, which constitutes domain knowledge rather than a step-by-step process or executable code. |
-| tree-branching | Knowledge | 0.90 | The content provides factual definitions, structural characteristics, use cases, and design guidelines for a specific infographic layout type. |
-| venn-diagram | Reference Material | 0.90 | The asset provides descriptive specifications, structural guidelines, and visual recommendations for a specific diagram type, serving as a reference for design rather than an executable skill or a general knowledge fact. |
-| winding-roadmap | Reference Material | 0.90 | The asset describes a visual layout template and its components, serving as external reference information for design rather than executable code or a procedural workflow. |
-| structured-content-template | Workflow | 0.95 | The asset defines a repeatable three-phase process (High-Level Outline, Section Development, Data Integrity Check) with specific steps and rules for transforming source material into structured content. |
-| aged-academia | Reference Material | 0.95 | The asset contains specific design guidelines, color palettes, and visual element descriptions intended to be referenced during the creation of infographics. |
-| bold-graphic | Reference Material | 0.90 | The asset contains structured external information (color palettes, visual elements, typography styles) stored for future reference in design tasks. |
-| chalkboard | Reference Material | 0.95 | The content provides specific design specifications, color codes, and stylistic guidelines for a 'chalkboard' aesthetic, serving as external reference material for creative projects. |
-| claymation | Reference Material | 0.90 | The content provides specific visual guidelines, color palettes, and stylistic elements for a claymation aesthetic, serving as a reference for design decisions rather than a procedural workflow or executable skill. |
-| corporate-memphis | Reference Material | 0.90 | The content describes an external visual style ('corporate-memphis') including its color palette, visual elements, and typography, serving as a reference for design rather than a direct executable skill or internal knowledge base. |
-| craft-handmade | Reference Material | 0.90 | The content defines a specific visual style guide (colors, typography, elements) to be used as a reference for generating infographics, rather than providing a step-by-step workflow or executable code. |
-| cyberpunk-neon | Reference Material | 0.90 | The asset contains curated external design specifications (color palettes, visual elements, typography styles) intended for reference during creative work. |
-| hand-drawn-edu | Reference Material | 0.90 | The asset contains specific visual style guidelines, color palettes, and design constraints intended to be referenced during the creation of infographics. |
-| ikea-manual | Reference Material | 0.90 | The asset defines a specific visual style (IKEA manual) with detailed attributes like color palette, visual elements, and typography, serving as a reference for design consistency rather than a procedural workflow or executable skill. |
-| kawaii | Reference Material | 0.90 | The asset contains specific design guidelines, color palettes, and visual elements for a stylistic reference (kawaii) intended to be used during the creation of infographics. |
-| knolling | Reference Material | 0.90 | The content provides specific visual guidelines, color palettes, and stylistic elements for a design reference (knolling), intended to be used as external information for future creative work rather than a direct executable skill or general knowledge fact. |
-| lego-brick | Reference Material | 0.90 | The content defines a specific visual style guide (colors, elements, typography) for a design reference, rather than providing a process, executable code, or general knowledge. |
-| morandi-journal | Reference Material | 0.95 | The asset contains specific visual guidelines, color palettes, and stylistic constraints intended to be referenced during the creation of infographic designs. |
-| origami | Reference Material | 0.90 | The content provides specific visual guidelines, color palettes, and stylistic elements for a design theme, serving as external reference material for creative execution rather than a general fact or executable skill. |
-| pixel-art | Reference Material | 0.90 | The content provides a structured description of a visual style (pixel art) including color palettes, elements, and typography, serving as a reference guide for design decisions rather than a direct workflow or executable skill. |
-| pop-laboratory | Reference Material | 0.95 | The content defines a specific visual style guide, including color palettes, typography, and design elements, intended to be referenced for creating infographics. |
-| retro-pop-grid | Reference Material | 0.90 | The content defines a specific visual style guide (color palette, typography, layout rules) intended to be referenced during the creation of infographics, rather than being a direct executable skill or a procedural workflow. |
-| storybook-watercolor | Reference Material | 0.90 | The content describes a specific visual style (storybook watercolor) including color palettes, elements, and typography, serving as a reference for design decisions rather than a procedural workflow or executable skill. |
-| subway-map | Reference Material | 0.90 | The asset contains specific visual design guidelines, color palettes, and stylistic elements for a subway map infographic, serving as external reference material for creative execution. |
-| technical-schematic | Reference Material | 0.90 | The content provides specific design guidelines, color palettes, and visual element specifications intended to be referenced during the creation of technical infographics. |
-| ui-wireframe | Reference Material | 0.90 | The asset contains specific design specifications (color palette, visual elements, typography) intended to be referenced for creating UI wireframes, rather than being a general fact, workflow, or executable skill. |
-| claude-design | Executable Skill | 0.95 | The asset is explicitly defined as a 'SKILL' with instructions on how to perform design tasks (creating HTML artifacts) using specific inputs and outputs, fitting the definition of an executable skill. |
-| official-cli | Reference Material | 0.95 | The content is a technical command reference guide documenting syntax, options, and usage for an external tool (comfy-cli), serving as stored information for future lookup rather than a reusable workflow or executable skill. |
-| rest-api | Reference Material | 0.95 | The content is a technical API reference document detailing endpoints, connection parameters, and usage examples for ComfyUI, serving as external information for developers. |
-| template-integrity | Reference Material | 0.90 | The document serves as a technical reference guide containing background context, specific rules, error handling examples, and compatibility notes for converting ComfyUI workflows, rather than a step-by-step executable script or a simple fact. |
-| workflow-format | Reference Material | 0.95 | The document serves as a technical specification and catalog for the ComfyUI workflow JSON format, detailing structures, node types, and parameter patterns for reference. |
-| README | Reference Material | 0.90 | The document serves as static documentation explaining how to run tests, their structure, and configuration details, rather than executable code or a dynamic workflow. |
-| README | Reference Material | 0.90 | The content is a documentation file (README) providing reference information, usage instructions, and configuration details for external workflow files. |
-| design-md | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and describes a specific capability ('Author/validate/export') with clear inputs (user requests, existing files) and outputs (DESIGN.md files, lint reports, exported JSON/Tailwind configs). It provides procedural knowledge on how to execute this task. |
-| starter | Reference Material | 0.90 | The asset contains structured design tokens (colors, typography, spacing) and component definitions that serve as a static reference for maintaining visual consistency, rather than a dynamic workflow or executable skill. |
-| dreamina | Executable Skill | 0.95 | The asset provides specific commands and procedures to install, authenticate, and execute tasks (image generation) using the Dreamina CLI tool. |
-| excalidraw | Executable Skill | 0.95 | The asset is explicitly defined as a 'Skill' that instructs an agent on how to directly perform a specific task (creating Excalidraw diagram files) using defined steps and tools. |
-| colors | Reference Material | 0.95 | The content consists of a structured table of color codes and usage guidelines intended for external reference during diagram creation. |
-| dark-mode | Reference Material | 0.90 | The content provides specific color codes, hex values, and technical notes for styling diagrams in Excalidark mode, serving as a lookup resource rather than a step-by-step process or general knowledge. |
-| examples | Reference Material | 0.95 | The asset contains specific technical examples and data structures (JSON schemas for Excalidraw diagrams) intended to be stored and referenced for future use, rather than being a general strategy or executable code. |
-| README | Knowledge | 0.90 | The content describes the capabilities, use cases, and prerequisites for a specific skill, serving as informational documentation rather than a direct executable script or a step-by-step procedural workflow. |
-| manim-video | Workflow | 0.95 | The asset defines a structured, repeatable pipeline (Plan, Code, Render, Stitch, Review) with specific steps, prerequisites, and modes for producing Manim videos, fitting the definition of a workflow or methodology. |
-| animation-design-thinking | Knowledge | 0.95 | The content provides strategic guidance, decision-making frameworks, and best practices for animation design rather than a strict step-by-step procedural workflow or executable code. |
-| animations | Reference Material | 0.95 | This document serves as a comprehensive technical reference for the Manim library, listing available animation classes, methods, and syntax examples for quick lookup. |
-| camera-and-3d | Reference Material | 0.95 | The content is a technical reference guide containing code snippets, API usage examples, and guidelines for using specific libraries (Manim) for camera and 3D operations. |
-| decorations | Reference Material | 0.90 | The content serves as a documentation reference for specific library functions (SurroundingRectangle, Brace, etc.) and their usage within the Manim framework, providing code examples and API details rather than a high-level strategy or executable script. |
-| equations | Reference Material | 0.95 | The content is a structured documentation file providing syntax examples, code snippets, and usage guidelines for LaTeX and Manim functions, serving as a reference for developers. |
-| graphs-and-data | Reference Material | 0.90 | The content consists of code snippets and documentation for the Manim library, serving as a reference for syntax and API usage rather than a standalone executable script or abstract knowledge. |
-| mobjects | Reference Material | 0.95 | The content is a structured documentation file listing classes, methods, constants, and usage examples for the Manim library, serving as an external information store for future coding tasks. |
-| paper-explainer | Workflow | 0.95 | The content explicitly describes a structured process ('The 5-minute template', 'Pre-code workflow') with sequential steps, gates, and methodologies for creating animated videos from research papers. |
-| production-quality | Knowledge | 0.95 | The content provides specific standards, best practices, and guidelines for creating high-quality animations, which constitutes factual knowledge and strategic advice rather than a step-by-step workflow or executable code. |
-| rendering | Reference Material | 0.95 | The content serves as a technical reference guide containing CLI commands, configuration examples, and usage instructions for the Manim library, rather than a step-by-step workflow or abstract knowledge. |
-| scene-planning | Reference Material | 0.90 | The content serves as a structured guide containing narrative structures, code snippets for transitions, consistency constants, checklists, and templates specifically for reference during video production. |
-| troubleshooting | Knowledge | 0.95 | The content provides specific facts, error explanations, and best practices for using the Manim library, which constitutes domain knowledge rather than a step-by-step workflow or executable code. |
-| updaters-and-trackers | Knowledge | 0.95 | The content provides factual explanations, strategies, and guidance on how to use Manim's updaters and value trackers, including code examples and best practices. |
-| visual-design | Knowledge | 0.95 | The content consists of design principles, guidelines, and best practices for visual design in Manim videos, which constitutes strategic knowledge rather than a repeatable workflow or executable code. |
-| README | Reference Material | 0.90 | The content serves as documentation describing the structure, capabilities, and prerequisites of a specific skill set, acting as a reference guide rather than executable code or a direct workflow. |
-| animation | Reference Material | 0.90 | The content is a structured documentation file containing code snippets, explanations, and technical details about animation techniques in p5.js, serving as a reference for developers. |
-| color-systems | Reference Material | 0.90 | The asset contains curated code snippets, constants, and API documentation for p5.js color systems, serving as a lookup resource rather than a standalone executable skill or abstract knowledge. |
-| core-api | Reference Material | 0.95 | The content is a technical API reference document detailing functions, parameters, and syntax for the p5.js library, intended for lookup rather than direct execution or strategic guidance. |
-| export-pipeline | Knowledge | 0.90 | The content provides factual guidance, technical strategies, code examples, and best practices for exporting generative art using p5.js and ffmpeg. |
-| interaction | Reference Material | 0.90 | The content serves as a comprehensive documentation and API reference for p5.js interaction features, including mouse, keyboard, touch, DOM, and audio events, intended for lookup rather than direct execution or strategic guidance. |
-| shapes-and-geometry | Reference Material | 0.95 | The content is a structured documentation of p5.js API functions, parameters, and code snippets for geometry and drawing, serving as an external reference for developers. |
-| troubleshooting | Knowledge | 0.95 | The content provides factual information, best practices, and technical guidance for optimizing and debugging p5.js sketches, including performance tips and common mistakes. |
-| typography | Reference Material | 0.90 | The content serves as a comprehensive documentation and code reference for typography features in p5.js, including API usage, examples, and technical details. |
-| webgl-and-3d | Reference Material | 0.90 | The content is a comprehensive technical reference guide documenting p5.js WebGL features, APIs, and code snippets for future lookup. |
-| popular-web-designs | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md', contains trigger phrases for invocation, and provides a concrete pattern for generating HTML/CSS artifacts using specific tools. |
-| airbnb | Reference Material | 0.95 | The content is a detailed documentation of an external design system (Airbnb's), including specific colors, typography, and component styles, intended for reference during implementation. |
-| airtable | Reference Material | 0.90 | The content provides detailed design specifications, color palettes, typography rules, and component styles for the Airtable brand, serving as external reference data for implementing a specific visual theme. |
-| bmw | Knowledge | 0.95 | The content provides detailed facts, design principles, color codes, and stylistic guidelines regarding the BMW brand identity, which constitutes structured knowledge. |
-| cal | Unknown | 0.00 |  |
-| clay | Reference Material | 0.95 | The content is a detailed documentation of an external design system (Clay), including specific color codes, typography rules, and component styles, intended for reference during implementation. |
-| clickhouse | Reference Material | 0.90 | The content is a detailed design system specification containing facts, styles, colors, and typography rules for a specific brand (ClickHouse), intended for reference during implementation. |
-| cohere | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography rules, and component styles for the Cohere website, serving as external reference information for implementation. |
-| coinbase | Reference Material | 0.90 | The content serves as a detailed design system specification and style guide for the Coinbase brand, providing reference data such as colors, typography, and layout principles for future implementation. |
-| cursor | Reference Material | 0.95 | The content consists of detailed design specifications, color codes, typography rules, and component styles for the Cursor website, serving as external reference data for implementing a similar design system. |
-| elevenlabs | Reference Material | 0.95 | The content is a detailed documentation of an existing external design system (ElevenLabs), including specific color codes, typography rules, and component styles, intended for reference during implementation. |
-| expo | Reference Material | 0.95 | The content provides detailed specifications, color codes, typography rules, and layout principles for a specific design system, serving as external reference data for implementation. |
-| figma | Knowledge | 0.95 | The content provides detailed facts, design specifications, and stylistic guidelines regarding the Figma brand and interface, which constitutes structured knowledge. |
-| framer | Reference Material | 0.90 | The content provides detailed specifications, color codes, typography rules, and component styles for a specific external entity (Framer's website design system), serving as a reference guide for implementation. |
-| hashicorp | Unknown | 0.00 |  |
-| intercom | Reference Material | 0.95 | The content is a detailed design system specification documenting visual styles, colors, typography, and components of the Intercom website, serving as external reference data for implementation. |
-| kraken | Reference Material | 0.90 | The content is a detailed design system specification containing facts, color codes, typography rules, and component styles for the Kraken brand, intended for reference during implementation. |
-| lovable | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, colors, typography, and components of the 'Lovable' website, serving as external reference data for implementation. |
-| minimax | Reference Material | 0.95 | The content is a detailed design system specification documenting visual styles, colors, typography, and components for an external entity (MiniMax), serving as a reference for implementation. |
-| mintlify | Reference Material | 0.95 | The content is a detailed design system specification documenting the visual attributes, typography, colors, and components of the Mintlify website, serving as external reference material for replication. |
-| miro | Reference Material | 0.90 | The content is a detailed design system specification (colors, typography, components) for an external entity (Miro), serving as reference data for implementation rather than a standalone workflow or executable skill. |
-| mistral.ai | Reference Material | 0.90 | The content provides detailed external specifications (colors, typography, layout rules) for the Mistral AI design system, serving as a reference guide for implementation. |
-| mongodb | Reference Material | 0.95 | The content is a detailed documentation of an external design system (MongoDB's visual identity, colors, typography, and components) intended for reference during implementation. |
-| notion | Reference Material | 0.95 | The content provides detailed external specifications (colors, typography, spacing, component styles) from the Notion website design system, intended for reference during implementation. |
-| nvidia | Unknown | 0.00 |  |
-| ollama | Unknown | 0.00 |  |
-| opencode.ai | Reference Material | 0.90 | The content is a detailed design system specification for an external website (opencode.ai), serving as reference material for implementing or replicating its visual style. |
-| pinterest | Reference Material | 0.95 | The content is a comprehensive design system specification detailing visual themes, color palettes, typography, and component styles for Pinterest, serving as external reference information for implementation. |
-| posthog | Reference Material | 0.95 | The content is a detailed documentation of an existing external design system (PostHog), including specific colors, typography, and component styles, intended for reference during implementation. |
-| raycast | Unknown | 0.00 |  |
-| replicate | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, colors, typography, and component styles for an external entity (Replicate). It serves as a reference guide for implementing or replicating this specific aesthetic. |
-| resend | Reference Material | 0.95 | The content is a detailed documentation of an existing external website's design system, including specific colors, typography, and component styles, intended for reference during implementation. |
-| revolut | Reference Material | 0.95 | The content is a detailed documentation of an external entity's (Revolut) design system, including specific colors, typography, and component styles, intended for reference during implementation. |
-| runwayml | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography rules, and component styles for a specific entity (Runway). It serves as external reference information for implementing or analyzing the design. |
-| sentry | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography rules, and component styles for the Sentry website, serving as external reference information for implementation. |
-| spacex | Reference Material | 0.95 | The content is a detailed design system specification documenting visual styles, colors, typography, and components of the SpaceX website, serving as external reference material for implementation. |
-| spotify | Reference Material | 0.95 | The content is a comprehensive design system specification detailing visual themes, color palettes, typography, and component styles for Spotify, serving as external reference data for implementation. |
-| supabase | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography rules, and component styles for the Supabase website, serving as a reference for replicating its aesthetic. |
-| superhuman | Unknown | 0.00 |  |
-| together.ai | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography, and component styles for an external entity (Together AI), serving as a reference guide for implementation. |
-| uber | Reference Material | 0.90 | The content is a detailed documentation of an external brand's design system (Uber), including specific colors, typography, and component styles, intended for reference during implementation. |
-| warp | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, color palettes, typography rules, and component styles for the 'Warp' website, serving as external reference data for implementation. |
-| webflow | Reference Material | 0.90 | The content provides specific design specifications, color codes, typography rules, and component styles for the Webflow platform, serving as a reference guide for replicating its visual identity. |
-| wise | Reference Material | 0.95 | The content is a detailed design system specification documenting visual styles, colors, typography, and components of an external entity (Wise), serving as reference data for implementation. |
-| x.ai | Reference Material | 0.95 | The content is a detailed design system specification documenting visual themes, colors, typography, and component styles for an external entity (x.ai), serving as a reference guide for implementation. |
-| zapier | Unknown | 0.00 |  |
-| pretext | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and describes a capability ('Use when building...') with specific inputs (text, font, width) and outputs (single-file HTML demos), including a workflow for execution. |
-| patterns | Reference Material | 0.90 | The content consists of copy-pasteable code snippets and documentation for specific library patterns, serving as external reference material for developers. |
-| sketch | Executable Skill | 0.95 | The asset is explicitly defined as a 'skill' that instructs an agent to perform a specific task (generating HTML mockups) with clear inputs, methods, and outputs. |
-| songwriting-and-ai-music | Knowledge | 0.95 | The content provides guidelines, strategies, and factual information on songwriting techniques, rhyme schemes, and Suno AI prompt engineering, rather than a strict step-by-step workflow or executable code. |
-| touchdesigner-mcp | Executable Skill | 0.95 | The document defines a specific skill ('touchdesigner-mcp') with instructions on how to directly perform tasks (controlling TouchDesigner via MCP tools), including critical rules, setup procedures, and implementation details for executing creative coding operations. |
-| 3d-scene | Reference Material | 0.90 | The document serves as a comprehensive technical reference for TouchDesigner 3D scenes, containing anatomy diagrams, parameter tables, code snippets, and troubleshooting guides intended for lookup rather than direct execution or step-by-step workflow instruction. |
-| animation | Reference Material | 0.90 | The content is a structured documentation page providing external technical information, API details, and code examples for TouchDesigner animation, intended for lookup and reference rather than being a direct executable skill or a simple fact. |
-| audio-reactive | Reference Material | 0.95 | The content is a structured documentation file containing code snippets, API parameters, and architectural patterns for TouchDesigner, serving as an external reference for developers rather than a direct executable skill or abstract knowledge. |
-| dat-scripting | Reference Material | 0.95 | The content is a structured documentation page detailing the features, parameters, and usage patterns of TouchDesigner's Execute DATs, serving as a lookup guide for developers. |
-| external-data | Reference Material | 0.90 | The content is a structured documentation file providing code snippets, API references, and usage patterns for TouchDesigner modules, intended for lookup rather than direct execution or as a standalone strategy. |
-| geometry-comp | Reference Material | 0.95 | The content is a structured technical reference guide for TouchDesigner's geometryCOMP, providing API details, code examples, and best practices for future lookup. |
-| glsl | Reference Material | 0.95 | The content serves as a technical reference guide for GLSL syntax, built-in functions, and specific implementations within TouchDesigner, storing external information for lookup. |
-| layout-compositor | Reference Material | 0.90 | The content is explicitly titled as a 'Reference' and provides external technical documentation, code snippets, and architectural patterns for TouchDesigner layout composition. |
-| midi-osc | Reference Material | 0.95 | The content is a technical reference guide documenting specific APIs, configurations, and common pitfalls for MIDI and OSC integration in TouchDesigner, intended for lookup rather than direct execution or step-by-step workflow instruction. |
-| operator-tips | Reference Material | 0.90 | The content provides reusable code snippets, configuration patterns, and specific technical rules for TouchDesigner operators, serving as a reference guide for implementation details. |
-| operators | Reference Material | 0.98 | The content is a structured technical reference listing TouchDesigner operators, their parameters, and uses, intended for lookup rather than direct execution or procedural guidance. |
-| panel-ui | Reference Material | 0.95 | The content serves as a comprehensive technical reference for TouchDesigner UI components, detailing specific operators, parameters, code snippets, and common pitfalls for future lookup. |
-| particles | Reference Material | 0.90 | The document serves as a comprehensive technical reference for TouchDesigner particle systems, including API details, code snippets, and comparison tables, intended for lookup rather than direct execution or step-by-step workflow instruction. |
-| postfx | Reference Material | 0.95 | The content is explicitly titled as a 'Reference' and provides external technical documentation, code snippets, and configuration details for TouchDesigner post-processing effects. |
-| projection-mapping | Reference Material | 0.95 | The content is a structured documentation file providing external technical references, code snippets, and configuration details for TouchDesigner projection mapping workflows. |
-| python-api | Reference Material | 0.95 | The content is a technical API reference document detailing modules, functions, and syntax for the TouchDesigner Python environment, serving as external information for lookup. |
-| replicator | Reference Material | 0.95 | The content is a technical documentation page ('Reference') detailing the usage, setup, and pitfalls of a specific software component (replicatorCOMP in TouchDesigner). |
-| troubleshooting | Reference Material | 0.90 | The document serves as a static repository of technical facts, configuration details, error codes, and known issues for TouchDesigner troubleshooting, rather than a step-by-step workflow or executable code. |
-| wavespeed | Executable Skill | 0.95 | The asset defines a specific capability ('wavespeed') to generate or edit AI media by invoking a CLI tool with clear inputs (commands, parameters) and outputs (JSON results, URLs). It includes a structured workflow for execution but is fundamentally a skill definition for performing a task. |
-| jupyter-live-kernel | Executable Skill | 0.95 | The asset provides specific instructions, prerequisites, and command-line workflows to directly perform the task of managing a live Jupyter kernel for iterative Python execution. |
-| agent-skill-governance | Executable Skill | 0.90 | The asset describes a specific technical capability ('Design and implement Skill CI/CD pipelines') with clear inputs (agent platforms, skill repositories) and outputs (governance infrastructure, reports, tests). It provides actionable implementation strategies and integration points, fitting the definition of a skill that can be directly performed. |
-| hermes-codebase-audit | Reference Material | 0.90 | The content is a detailed audit report documenting existing infrastructure, limitations, and code references within the Hermes codebase, serving as external information for future development or review. |
-| skill-inspector-debugging | Knowledge | 0.90 | The content documents specific debugging findings, root causes, fixes, and key lessons learned from a technical session, which constitutes factual knowledge and strategic guidance. |
-| credential-security | Executable Skill | 0.90 | The file is named SKILL.md and describes a specific capability ('credential-security') with decision trees, checklists, and anti-patterns for performing the task of managing credentials securely. |
-| agy-tui-container-issue | Reference Material | 0.90 | The document serves as a technical reference for a specific software issue, detailing the root cause, error messages, and workarounds for the 'agy' binary within containers. |
-| token-storage-research | Reference Material | 0.90 | The content is a compiled archive of external sources (OWASP, GitHub Docs) and Q&A regarding token storage, serving as a reference document rather than a direct executable skill or workflow. |
-| kanban-orchestrator | Executable Skill | 0.95 | The content provides a specific playbook and set of rules for an 'orchestrator profile' to perform the task of decomposing and routing work through a Kanban system, acting as a direct instruction for execution. |
-| kanban-worker | Knowledge | 0.95 | The content provides detailed guidance, best practices, pitfalls, and examples for using the kanban-worker system, which constitutes strategic knowledge rather than a repeatable workflow or executable code. |
-| webhook-subscriptions | Executable Skill | 0.95 | The document describes a specific capability ('webhook-subscriptions') with clear instructions on how to perform tasks like creating, listing, and testing subscriptions using CLI commands, fitting the definition of an executable skill. |
-| dogfood | Executable Skill | 0.95 | The asset is explicitly defined as a 'skill' that guides the agent through a specific, actionable process (QA testing) using concrete tools and inputs to produce a direct output (bug report). |
-| issue-taxonomy | Reference Material | 0.95 | The content defines a structured taxonomy and set of criteria used to classify issues, serving as an external reference standard for QA testing rather than a procedural workflow or executable skill. |
-| dogfood-report-template | Reference Material | 0.90 | This is a static template file used as a reference structure for generating reports, containing placeholders rather than executable logic or specific factual knowledge. |
-| himalaya | Executable Skill | 0.95 | The asset is explicitly defined as a 'skill' for an agent to perform email operations using the Himalaya CLI, providing specific commands and workflows for tasks like sending, reading, and managing emails. |
-| configuration | Reference Material | 0.95 | The content is a technical reference guide detailing configuration syntax, options, and examples for the Himalaya email client, intended for lookup rather than direct execution or procedural workflow. |
-| message-composition | Reference Material | 0.95 | The content serves as a technical documentation and syntax reference for the MML language used in Himalaya, providing definitions, examples, and tag specifications rather than a step-by-step workflow or executable code. |
-| minecraft-modpack-server | Executable Skill | 0.95 | The asset provides a structured procedure with clear inputs (user preferences, pack URL) and outputs (configured server, launch scripts, backups) that can be directly executed to perform a specific task. |
-| pokemon-player | Executable Skill | 0.95 | The asset defines a specific procedure to autonomously perform a task (playing Pokemon via emulation) with clear inputs, outputs, and execution steps. |
-| codebase-inspection | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a repeatable method to perform a specific task (codebase inspection) using a tool (pygount) with defined inputs and outputs. |
-| github-auth | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured decision tree and executable commands to detect environment state and perform specific tasks (setting up GitHub authentication). |
-| github-code-review | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured methodology with specific commands and workflows to perform the task of reviewing code on GitHub, fitting the definition of an executable skill for an agent. |
-| review-output-template | Workflow | 0.90 | The asset provides a structured template and severity guide for conducting code reviews, defining a repeatable process and methodology for evaluating pull requests. |
-| github-issues | Executable Skill | 0.95 | The asset provides concrete commands (gh/curl) and scripts to directly perform tasks like creating, viewing, and managing GitHub issues, fitting the definition of an executable skill with clear inputs and outputs. |
-| bug-report | Workflow | 0.90 | This is a structured template defining a repeatable process for reporting bugs, guiding users through specific steps like reproduction and environment details. |
-| feature-request | Workflow | 0.90 | This is a structured template for submitting feature requests, defining a repeatable process for users to follow when proposing new features. |
-| github-pr-workflow | Workflow | 0.95 | The content describes a complete, repeatable process for managing the GitHub Pull Request lifecycle, including branching, committing, creating PRs, monitoring CI, and merging. |
-| ci-troubleshooting | Knowledge | 0.95 | The asset contains factual troubleshooting guides, diagnostic steps, and common fixes for CI failures, which constitutes structured knowledge and guidance. |
-| conventional-commits | Knowledge | 0.95 | The asset provides factual definitions, syntax rules, and guidance for writing conventional commits, which constitutes structured knowledge rather than a repeatable workflow or executable code. |
-| pr-body-bugfix | Workflow | 0.90 | It provides a structured template for the repeatable process of documenting and submitting a bug fix pull request. |
-| pr-body-feature | Workflow | 0.90 | This asset defines a structured template for creating pull requests, outlining a repeatable process and methodology for documenting changes, motivation, and testing within a software development workflow. |
-| github-repo-management | Executable Skill | 0.95 | The asset provides concrete commands and scripts to directly perform tasks such as cloning, creating, and managing GitHub repositories, fitting the definition of an executable skill with clear inputs and outputs. |
-| github-api-cheatsheet | Reference Material | 0.95 | This asset is a cheatsheet containing factual API endpoints, HTTP methods, and usage patterns for the GitHub REST API, serving as external reference information. |
-| find-nearby | Executable Skill | 0.95 | The asset describes a specific tool/script that performs a task (finding nearby places) with clear inputs and outputs, accompanied by usage instructions. |
-| cold-start-acquisition | Knowledge | 0.95 | The content provides strategic guidance, philosophy, and detailed tactics for customer acquisition rather than a rigid, step-by-step executable procedure or a simple fact. |
-| growth-tactics-quick-ref | Reference Material | 0.95 | The asset is explicitly titled 'Quick Reference' and serves as a condensed catalog linking to other detailed resources, fitting the definition of external information stored for future use. |
-| reddit-account-vendors | Reference Material | 0.90 | The content lists external marketplaces, verification tools, and specific pricing data for purchasing Reddit accounts, serving as a directory of external resources rather than a procedural guide or abstract knowledge. |
-| developer-tool-promotion | Executable Skill | 0.95 | The asset is explicitly named 'SKILL' and describes a capability to perform specific tasks (promoting tools, drafting content, evaluating channels) with defined inputs and outputs, rather than just storing facts or a static process. |
-| catbox-litterbox-upload | Reference Material | 0.90 | The content provides specific technical details, API endpoints, form structures, and troubleshooting steps for an external service (Litterbox/Catbox), serving as a reference for developers integrating with it. |
-| discord-post-example | Reference Material | 0.90 | The asset contains a specific example of a past communication (a Discord post) and its analysis, stored as a reference for future adaptation rather than being a general strategy or executable skill. |
-| discord-post-workflow-automation | Knowledge | 0.90 | The content provides strategic guidance, patterns, and tips for creating marketing posts, which constitutes knowledge rather than a direct executable workflow or reference material. |
-| medium-article | Workflow | 0.95 | The content provides a structured, repeatable template and step-by-step methodology for writing a specific type of article, defining a clear process from hook to CTA. |
-| medium-workflow-automation | Workflow | 0.90 | The content provides a structured, repeatable template and methodology for creating a specific type of article, detailing steps, structure, and checklists. |
-| mcporter | Executable Skill | 0.95 | The asset describes how to use a specific CLI tool (mcporter) to perform concrete tasks like listing servers, calling tools, and managing configuration, which fits the definition of an executable skill with clear inputs and outputs. |
-| native-mcp | Knowledge | 0.95 | The content provides detailed documentation, configuration guides, and operational facts about the native-mcp feature, serving as reference knowledge rather than a step-by-step workflow or executable code. |
-| gif-search | Executable Skill | 0.95 | The asset provides specific command-line instructions (using curl and jq) to perform a concrete task: searching for and downloading GIFs from the Tenor API. |
-| heartmula | Executable Skill | 0.95 | The file defines a specific tool (HeartMuLa) with clear instructions on how to install, configure, and execute it to generate music from lyrics, fitting the definition of an executable skill with direct inputs and outputs. |
-| songsee | Executable Skill | 0.95 | The asset describes a CLI tool that performs a specific task (generating audio visualizations) with clear inputs (audio files) and outputs (images), fitting the definition of an executable skill. |
-| youtube-content | Executable Skill | 0.95 | The asset describes a specific tool with a helper script that performs a direct task (fetching and formatting YouTube transcripts) with clear inputs (URL) and outputs (structured text). |
-| output-formats | Reference Material | 0.90 | The asset contains examples and templates for various output formats (chapters, summaries, tweets, etc.) intended to be used as a reference guide when generating content. |
-| modal | Knowledge | 0.95 | The content is a comprehensive guide providing facts, usage scenarios, configuration details, and best practices for using the Modal platform, which aligns with the definition of Knowledge. |
-| advanced-usage | Reference Material | 0.95 | This is a technical reference guide containing documentation, code snippets, and configuration details for the Modal platform, intended for lookup during development rather than direct execution or strategic guidance. |
-| troubleshooting | Reference Material | 0.90 | This document serves as a static guide containing factual solutions, commands, and code snippets for troubleshooting specific issues within the Modal platform, intended for lookup rather than direct execution or procedural workflow. |
-| lm-evaluation-harness | Executable Skill | 0.95 | The asset provides specific commands, scripts, and code snippets to directly perform LLM benchmarking tasks with clear inputs (models, tasks) and outputs (metrics, logs). |
-| api-evaluation | Reference Material | 0.90 | The document serves as a comprehensive guide and reference for evaluating API-based language models, containing setup instructions, configuration options, code examples, and troubleshooting steps rather than a single executable script or abstract knowledge. |
-| benchmark-guide | Reference Material | 0.95 | The document serves as a comprehensive catalog and lookup guide for external benchmarks, providing definitions, commands, and interpretation standards rather than a unique reusable workflow or executable skill. |
-| custom-tasks | Knowledge | 0.95 | The content is a comprehensive guide providing facts, strategies, and detailed instructions on how to create and configure custom evaluation tasks within the lm-evaluation-harness framework. |
-| distributed-eval | Reference Material | 0.90 | The content is a technical guide containing documentation, command-line examples, and configuration references for running distributed evaluations, intended for lookup rather than direct execution or procedural workflow definition. |
-| weights-and-biases | Executable Skill | 0.95 | The asset is explicitly named and described as a 'SKILL' that enables the direct performance of tasks such as logging experiments, running sweeps, and managing models using the W&B library, supported by concrete code examples. |
-| artifacts | Knowledge | 0.95 | The content is a comprehensive guide containing facts, definitions, best practices, and code examples for using W&B Artifacts, which constitutes strategic knowledge and guidance. |
-| integrations | Reference Material | 0.90 | The document serves as a comprehensive guide containing code snippets and instructions for integrating Weights & Biases with various ML frameworks, acting as external reference material for developers. |
-| sweeps | Knowledge | 0.95 | The content is a comprehensive guide containing facts, strategies, configuration examples, and best practices for hyperparameter optimization using W&B Sweeps. |
-| huggingface-hub | Reference Material | 0.95 | The content is a comprehensive reference guide documenting commands, flags, and usage patterns for the Hugging Face CLI, serving as external information for future lookup rather than a step-by-step workflow or executable skill definition. |
-| gguf | Knowledge | 0.90 | The content provides factual information, strategic guidance, and technical details about the GGUF format and quantization methods, rather than a strict step-by-step workflow or executable code. |
-| advanced-usage | Reference Material | 0.90 | The content is a technical guide containing code snippets, command-line examples, and configuration details for GGUF models, serving as a reference for implementation rather than a standalone executable skill or abstract knowledge. |
-| troubleshooting | Reference Material | 0.90 | This is a static troubleshooting guide containing facts, error codes, and solutions for specific software issues, serving as a reference document rather than a dynamic workflow or executable skill. |
-| guidance | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides code examples, installation instructions, and usage patterns for performing constrained LLM generation tasks using the Guidance library. |
-| backends | Reference Material | 0.95 | The document serves as a comprehensive technical reference guide containing configuration details, code snippets, model lists, and performance comparisons for various LLM backends, intended for lookup rather than direct execution or step-by-step workflow instruction. |
-| constraints | Reference Material | 0.90 | The content is a comprehensive guide documenting specific technical patterns, code examples, and best practices for using the Guidance library, serving as a reference for developers. |
-| llama-cpp | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides actionable instructions, commands, and code snippets for performing specific tasks like local inference, model discovery, and server setup using llama.cpp. |
-| advanced-usage | Reference Material | 0.90 | The content is a technical guide containing documentation, code snippets, and configuration examples for advanced usage of llama.cpp, serving as a reference for developers rather than a standalone executable script or a simple fact. |
-| hub-discovery | Workflow | 0.95 | The content outlines a structured, repeatable process (steps 1-5) for discovering, verifying, and building commands for Hugging Face models using llama.cpp. |
-| optimization | Knowledge | 0.90 | The content provides factual guidance, best practices, and performance benchmarks for optimizing llama.cpp inference, rather than a step-by-step workflow or executable code. |
-| quantization | Reference Material | 0.90 | The document serves as a comprehensive guide containing factual data, specifications, commands, and external links regarding GGUF quantization, intended for lookup rather than direct execution or procedural workflow. |
-| server | Reference Material | 0.90 | The content is a technical guide containing commands, configurations, and examples for deploying a server, serving as external reference information rather than a direct executable skill or abstract knowledge. |
-| troubleshooting | Reference Material | 0.90 | The content is a structured guide containing facts, commands, and solutions for troubleshooting specific technical issues, serving as a reference for users rather than a workflow or executable skill. |
-| obliteratus | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a detailed, step-by-step procedural guide (installation, hardware check, execution, verification) for performing a specific technical task using a CLI tool. |
-| analysis-modules | Reference Material | 0.95 | The document serves as a catalog and index of available tools and modules within the OBLITERATUS framework, providing metadata and descriptions rather than executable code or procedural steps. |
-| methods-guide | Knowledge | 0.95 | The content provides detailed factual information, theoretical explanations, and strategic guidance on how to use various methods within the OBLITERATUS tool, fitting the definition of knowledge assets. |
-| abliteration-config | Reference Material | 0.90 | This is a configuration file containing static parameters and settings for a specific tool run, serving as reference data rather than executable code or procedural knowledge. |
-| analysis-study | Workflow | 0.90 | The asset defines a structured configuration for running a specific sequence of analysis modules (a methodology) to understand model behavior before performing further actions. |
-| batch-abliteration | Reference Material | 0.90 | The asset is a configuration file containing static data (model names, tiers, default settings) intended for reference during a batch processing workflow, rather than executable code or procedural knowledge itself. |
-| outlines | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and describes how to directly perform tasks (structured generation) using the Outlines library with clear code examples and inputs/outputs. |
-| backends | Reference Material | 0.95 | The document serves as a comprehensive technical guide containing configuration examples, feature comparisons, and performance metrics for various model backends, acting as external reference information rather than a direct executable skill or simple fact. |
-| json_generation | Reference Material | 0.90 | The content is a comprehensive technical guide containing code examples, documentation, and explanations for using the Outlines library, serving as a reference for developers. |
-| vllm | Executable Skill | 0.90 | The file is named SKILL.md and provides concrete code snippets, installation commands, and operational procedures to directly perform the task of serving LLMs with vLLM. |
-| optimization | Knowledge | 0.95 | The document contains factual explanations of technical concepts (PagedAttention, continuous batching), strategies for optimization, and guidance on configuration and troubleshooting. |
-| quantization | Knowledge | 0.95 | The content provides factual comparisons, technical specifications, and strategic guidance on quantization methods (AWQ, GPTQ, FP8) for LLM inference, including trade-offs and recommendations. |
-| server-deployment | Reference Material | 0.90 | The content consists of code snippets, configuration files, and documentation examples for server deployment patterns, serving as external reference material rather than a direct executable skill or abstract knowledge. |
-| troubleshooting | Knowledge | 0.95 | The asset contains factual information, diagnostic steps, and strategic guidance for resolving specific technical issues with vLLM, fitting the definition of knowledge. |
-| audiocraft | Knowledge | 0.95 | The content is a comprehensive guide detailing facts, usage scenarios, architectural concepts, and best practices for the Audiocraft library, rather than a strict executable script or simple preference. |
-| advanced-usage | Knowledge | 0.90 | The content is a comprehensive guide containing factual information, code examples, and strategic advice on how to use AudioCraft for various tasks like fine-tuning, deployment, and integration. It serves as reference material and instructional knowledge rather than a strict repeatable workflow or a standalone executable skill. |
-| troubleshooting | Knowledge | 0.95 | The content is a troubleshooting guide containing facts, strategies, and solutions for resolving specific technical issues with the AudioCraft library. |
-| clip | Executable Skill | 0.90 | The file is named SKILL.md and provides concrete Python code examples for performing specific tasks like zero-shot classification and image-text matching, which aligns with the definition of an executable skill. |
-| applications | Reference Material | 0.90 | The document serves as a practical guide containing code examples, usage patterns, and links to external resources (paper, GitHub, Colab) for implementing CLIP applications. |
-| segment-anything | Executable Skill | 0.90 | The asset provides specific Python code snippets, installation instructions, and API usage patterns for the Segment Anything Model, enabling direct execution of image segmentation tasks. |
-| advanced-usage | Reference Material | 0.90 | The content is a comprehensive guide containing installation instructions, code snippets, API references, and comparisons for various models (SAM, SAM 2, Grounded SAM). It serves as external technical documentation and reference material for developers rather than a specific user preference or a simple fact. |
-| troubleshooting | Knowledge | 0.95 | The asset is a troubleshooting guide containing facts, solutions, and strategies for resolving specific technical issues with the Segment Anything model. |
-| stable-diffusion | Knowledge | 0.90 | The content is a comprehensive guide containing facts, usage scenarios, architectural overviews, parameter explanations, and code examples for using Stable Diffusion. It serves as instructional material rather than a strict repeatable workflow or an executable script itself. |
-| advanced-usage | Knowledge | 0.90 | This asset is a comprehensive guide containing facts, strategies, code examples, and technical guidance on how to use Stable Diffusion models for advanced tasks like custom pipelines, fine-tuning, and optimization. |
-| troubleshooting | Knowledge | 0.95 | The asset is a troubleshooting guide containing facts, known errors, and specific solutions/guidance for resolving issues with Stable Diffusion models. |
-| whisper | Executable Skill | 0.90 | The asset is explicitly named 'SKILL' and provides concrete code examples, installation steps, and usage instructions to directly perform speech-to-text tasks. |
-| languages | Reference Material | 0.90 | The document serves as a comprehensive guide listing supported languages, performance metrics, and external resources for the Whisper model, acting primarily as static reference information rather than a direct executable skill or simple fact. |
-| dspy | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and describes how to directly perform tasks using the DSPy framework, including installation, coding patterns, and execution of AI modules. |
-| examples | Unknown | 0.00 |  |
-| modules | Reference Material | 0.95 | The content is a comprehensive documentation guide detailing the features, usage, and patterns of DSPy modules, serving as external reference information for developers. |
-| optimizers | Knowledge | 0.95 | The content provides factual information, strategic guidance, and detailed explanations about DSPy optimizers, including their functions, parameters, and best practices. |
-| axolotl | Executable Skill | 0.90 | The asset is explicitly named 'axolotl' and defined as a 'Skill' in its metadata. It provides expert guidance, common patterns, and code examples for performing the task of fine-tuning LLMs using the Axolotl framework, fitting the definition of an executable skill that assists in direct task performance. |
-| index | Reference Material | 0.95 | The content serves as a table of contents or index for external documentation files, acting as a navigational reference rather than containing substantive knowledge, workflows, or executable skills itself. |
-| README | Knowledge | 0.95 | The content provides expert-level guidance, conceptual explanations, best practices, and troubleshooting tips for GRPO/RL training, which aligns with the definition of Knowledge. |
-| grpo-rl-training | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides expert guidance, implementation workflows, and code templates for performing the specific task of GRPO/RL training. It defines clear inputs (datasets, config) and outputs (trained models), fitting the definition of an executable skill that guides direct task performance. |
-| peft | Executable Skill | 0.90 | The asset is named 'SKILL.md' and provides concrete Python code examples, installation steps, and specific configurations to directly perform the task of fine-tuning LLMs using PEFT. |
-| advanced-usage | Knowledge | 0.95 | The content provides factual information, strategic guidance, and technical explanations regarding various PEFT methods (DoRA, AdaLoRA, etc.), including when to use them and their benefits. |
-| troubleshooting | Reference Material | 0.90 | The document serves as a comprehensive guide containing factual error messages, diagnostic steps, and code snippets for resolving specific technical issues, functioning primarily as a reference for troubleshooting rather than a step-by-step workflow or executable skill. |
-| index | Reference Material | 0.90 | The content serves as a navigation index or table of contents for documentation, acting as a reference point to locate other materials rather than containing substantive knowledge, workflows, or skills itself. |
-| trl-fine-tuning | Executable Skill | 0.90 | The asset provides specific Python code snippets, CLI commands, and configuration steps to directly perform LLM fine-tuning tasks using the TRL library, fitting the definition of an executable skill with clear inputs and outputs. |
-| dpo-variants | Reference Material | 0.90 | The content is a comprehensive technical guide documenting specific software library features (TRL DPO variants), including formulas, configuration examples, and external citations, serving as a static reference for developers. |
-| online-rl | Knowledge | 0.90 | The content is a guide providing facts, explanations, and usage examples for specific reinforcement learning algorithms (PPO, GRPO), which fits the definition of knowledge. |
-| reward-modeling | Knowledge | 0.95 | The asset is a guide containing facts, strategies, code examples, and explanations for training reward models, which fits the definition of knowledge. |
-| sft-training | Knowledge | 0.95 | The asset provides factual information, strategic guidance, and reference materials regarding Supervised Fine-Tuning (SFT) processes, including dataset formats, hyperparameter recommendations, and code examples. |
-| unsloth | Executable Skill | 0.95 | The asset is explicitly named 'unsloth' and described as a 'Skill' providing expert guidance and common patterns for performing fast fine-tuning tasks, fitting the definition of an executable skill that can directly assist in performing a task. |
-| index | Reference Material | 0.95 | The content serves as an index or table of contents for external documentation files, acting as a navigational aid to stored reference material rather than containing knowledge, workflows, or executable skills itself. |
-| llms | Reference Material | 0.95 | The content is a table of contents or index linking to various documentation pages for the Unsloth framework, serving as a repository of external information and links rather than a standalone procedure or fact. |
-| obsidian | Executable Skill | 0.95 | The content defines a specific capability ('Read, search, create, and edit notes') with clear operational guidelines and tool usage patterns, fitting the definition of an executable skill. |
-| airtable | Executable Skill | 0.95 | The asset provides specific instructions, prerequisites, and code snippets (curl commands) enabling the direct execution of tasks against the Airtable API. |
-| google-workspace | Executable Skill | 0.95 | The asset provides specific scripts, CLI commands, and usage instructions to directly perform tasks such as sending emails, managing calendars, and manipulating files within Google Workspace. |
-| gmail-search-syntax | Reference Material | 0.95 | The asset is a documentation file containing standard syntax rules and examples for Gmail search operators, serving as an external reference guide rather than a process or executable code. |
-| linear | Executable Skill | 0.95 | The asset provides specific instructions, prerequisites, and code snippets (curl commands) to directly perform tasks such as managing Linear issues and projects via their API. |
-| maps | Executable Skill | 0.95 | The asset defines a specific tool ('maps') with executable commands (search, nearby, distance, etc.) that take clear inputs and produce structured outputs, fitting the definition of an executable skill. |
-| nano-pdf | Executable Skill | 0.95 | The asset defines a specific CLI tool usage pattern with clear inputs (file, page, instruction) and outputs (edited PDF), enabling direct task execution. |
-| notion | Executable Skill | 0.95 | The document provides specific commands, code snippets, and procedural steps to directly interact with the Notion API and CLI to perform tasks like creating pages, querying databases, and deploying workers. |
-| block-types | Reference Material | 0.95 | The content is explicitly labeled as a reference for Notion block types and API structures, serving as external technical documentation stored for future lookup. |
-| ocr-and-documents | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides specific tools, commands, and code snippets to directly perform the task of extracting text from PDFs and scanned documents. |
-| powerpoint | Executable Skill | 0.95 | The asset is explicitly named 'powerpoint' and described as a 'Skill' that can directly perform tasks (create, read, edit .pptx files) with clear inputs and outputs, supported by specific commands and workflows. |
-| editing | Workflow | 0.95 | The content outlines a specific, repeatable 7-step process for editing PowerPoint presentations using command-line tools and scripts. |
-| pptxgenjs | Knowledge | 0.95 | The content is a tutorial providing facts, code examples, configuration details, and best practices for using the PptxGenJS library. |
-| teams-meeting-pipeline | Executable Skill | 0.95 | The asset is explicitly defined as a 'skill' that instructs an agent on how to operate a specific CLI pipeline, including decision trees and command references for direct task execution. |
-| godmode | Executable Skill | 0.95 | The asset is defined as a 'Skill' with specific execution steps, code snippets, and automated functions (e.g., auto_jailbreak) designed to directly perform the task of bypassing LLM safety filters. |
-| jailbreak-templates | Reference Material | 0.90 | The asset contains specific external templates, source links, and configuration examples intended for storage and retrieval during red-teaming activities, rather than being a general strategy or executable code itself. |
-| refusal-detection | Reference Material | 0.90 | The asset contains a curated list of patterns, rules, and scoring criteria used as reference data for detecting refusals and evaluating response quality. |
-| arxiv | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides concrete commands, scripts, and workflows to directly perform the task of searching and retrieving academic papers from arXiv and Semantic Scholar APIs. |
-| blogwatcher | Executable Skill | 0.95 | The asset defines a specific CLI tool with clear commands and workflows for monitoring blogs, representing a direct capability to perform tasks. |
-| llm-wiki | Executable Skill | 0.95 | The asset is named 'SKILL.md' and provides detailed operational instructions, activation triggers, and core operations (Ingest, Query) for an agent to perform specific tasks, fitting the definition of an executable skill. |
-| polymarket | Executable Skill | 0.95 | The file is named SKILL.md and describes a specific capability (querying Polymarket data) with clear triggers, workflows, and technical details for execution, fitting the definition of an executable skill. |
-| api-endpoints | Reference Material | 0.98 | The content is a static documentation of external API endpoints, including URLs, parameters, and response structures, intended for lookup rather than execution or strategic reasoning. |
-| autoreason-methodology | Knowledge | 0.95 | The content provides strategic guidance, decision trees, and empirical findings on when and how to apply iterative refinement methodologies, rather than being a direct executable script or simple reference link. |
-| checklists | Reference Material | 0.95 | The asset contains external factual information regarding mandatory checklist requirements and formatting rules for various academic conferences, stored for future reference during paper submission. |
-| citation-workflow | Workflow | 0.95 | The content explicitly defines a 'Verified Citation Workflow' consisting of a repeatable 5-step process (Search, Verify, Retrieve, Validate, Add) for managing citations, supported by procedural code examples. |
-| human-evaluation | Knowledge | 0.95 | The asset is a comprehensive guide containing facts, strategies, definitions, and best practices for conducting human evaluations in ML/AI research. |
-| paper-types | Knowledge | 0.95 | The content provides factual guidance, structural templates, and strategic advice for writing specific types of academic papers, which constitutes domain knowledge rather than a repeatable workflow or executable skill. |
-| reviewer-guidelines | Reference Material | 0.95 | The content consists of structured external information regarding evaluation criteria, scoring systems, and processes for various academic conferences, stored for future reference by authors. |
-| sources | Reference Material | 0.95 | The document serves as a bibliography and index of external resources, tools, APIs, and guidelines relevant to research paper writing, rather than containing the procedural knowledge or executable skills itself. |
-| writing-guide | Knowledge | 0.95 | The content provides specific facts, strategies, and best practices for writing machine learning papers, derived from expert opinions and established principles. |
-| README | Reference Material | 0.90 | The content serves as a documentation index and guide for accessing external resources (official conference templates, compilers, and IDEs) rather than containing the reusable knowledge, workflows, or executable code itself. |
-| README | Reference Material | 0.90 | The asset is a README file containing documentation, usage instructions, and technical details for a LaTeX template, serving as reference material for users rather than executable code or a standalone workflow. |
-| README | Reference Material | 0.95 | The content provides links to external resources (Overleaf, GitHub, formatting guidelines) and instructions on how to access and use them, serving as a reference for locating official templates. |
-| anthology.bib | Reference Material | 0.90 | The content provides external URLs and specific details about the ACL Anthology BibTeX files, serving as a reference for locating and citing resources rather than being executable code or a general strategy. |
-| formatting | Reference Material | 0.95 | The content consists of specific external guidelines, rules, and formatting specifications provided by the ACL organization for authors to follow, rather than internal knowledge or executable skills. |
-| openhue | Executable Skill | 0.95 | The asset defines a specific tool (OpenHue CLI) with clear prerequisites, commands, and usage scenarios for directly controlling hardware, fitting the definition of an executable skill. |
-| social-engineering-defense | Executable Skill | 0.90 | The asset is explicitly named 'SKILL' and provides a specific, actionable protocol (refuse, download, inspect, verify) for detecting and defending against social engineering attacks, functioning as a direct behavioral instruction for task execution. |
-| fake-google-antigravity-2026-06-20 | Knowledge | 0.90 | The content documents a specific security incident, analyzes the attack vector (brand impersonation), and extracts lessons learned and verification strategies, which constitutes factual knowledge and guidance. |
-| xitter | Executable Skill | 0.95 | The asset is explicitly defined as a 'skill' for interacting with the X/Twitter API via a CLI tool, providing specific commands, prerequisites, and workflow steps to perform tasks. |
-| xurl | Executable Skill | 0.95 | The document defines a CLI tool (`xurl`) with specific commands to perform tasks (posting, searching, etc.) and provides instructions for an agent to execute these commands, fitting the definition of an executable skill. |
-| dual-brand-frontend | Executable Skill | 0.90 | The asset describes a specific technical pattern and provides code implementations for a frontend feature, enabling the direct execution of building a dual-brand landing page. |
-| hermes-agent-skill-authoring | Knowledge | 0.95 | The document provides factual guidelines, structural requirements, and best practices for authoring specific configuration files within the Hermes Agent ecosystem. |
-| node-inspect-debugger | Executable Skill | 0.95 | The asset provides specific commands, scripts, and procedures to directly perform the task of debugging Node.js applications using the inspect protocol and Chrome DevTools. |
-| plan | Executable Skill | 0.95 | The asset is explicitly named 'plan' and described as a 'skill' that instructs an agent on how to perform the specific task of writing an actionable markdown plan, including core behaviors, output requirements, and interaction styles. |
-| python-debugpy | Executable Skill | 0.95 | The asset provides actionable recipes, commands, and procedures for performing the specific task of debugging Python applications using pdb and debugpy, fitting the definition of an executable skill with clear inputs and outputs. |
-| requesting-code-review | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and describes a concrete, automated verification pipeline with clear inputs (git diff) and outputs (commit or fix), intended to be executed directly. |
-| simplify-code | Executable Skill | 0.95 | The asset defines a specific, executable procedure ('simplify-code') triggered by user commands, involving distinct phases of identification, parallel execution of sub-agents, and application of fixes, fitting the definition of an executable skill with clear inputs and outputs. |
-| skill-audit-patterns | Knowledge | 0.90 | The content describes patterns, best practices, and strategic guidance for auditing skill libraries, rather than a step-by-step workflow or executable code. |
-| package-audit-implementation | Reference Material | 0.90 | The content provides detailed architectural documentation, code structure descriptions, and usage instructions for a specific software version, serving as a reference for understanding the system's implementation. |
-| spike | Executable Skill | 0.95 | The asset defines a repeatable methodology with specific steps (Decompose, Research, Build, Verdict) and tool usage instructions, enabling the direct execution of a 'spike' task to validate technical ideas. |
-| subagent-driven-development | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured methodology for executing development tasks via subagent delegation, including specific steps, tool usage, and decision logic. |
-| systematic-debugging | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured methodology with specific actions, tool usage (e.g., terminal commands, search_files), and decision logic for performing the task of debugging. |
-| test-driven-development | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a concrete, repeatable methodology (Red-Green-Refactor) with specific actions, verification steps, and integration commands for performing software development tasks. |
-| writing-plans | Executable Skill | 0.95 | The asset is explicitly named 'SKILL.md' and provides a structured methodology with specific steps, templates, and decision logic for creating implementation plans, enabling direct execution of the planning task. |
-| wavespeed | Executable Skill | 0.95 | The asset defines a specific capability (generating/editing AI media) with clear operational steps, command-line inputs, and expected outputs, fitting the definition of an executable skill. |
-| flux-flash-infographics | Reference Material | 0.90 | The content provides specific details about an external tool (FLUX 2 Flash), including metrics, pricing, and usage guidelines, serving as a reference for selecting the right model. |
-| yuanbao | Executable Skill | 0.95 | The asset defines specific tools and procedures for performing tasks like querying group info, finding members, and sending messages within the Yuanbao platform, which fits the definition of an executable skill. |
+Used Skills: 4
 
-## Duplicate Clusters
+Unused Skills: 66
 
-### Cluster 1 (average similarity 1.00)
-- advanced-usage (`mlops/inference/gguf/references/advanced-usage.md`)
-- advanced-usage (`mlops/inference/llama-cpp/references/advanced-usage.md`)
+Utilization Rate: 5.7%
 
-### Cluster 2 (average similarity 1.00)
-- troubleshooting (`mlops/inference/gguf/references/troubleshooting.md`)
-- troubleshooting (`mlops/inference/llama-cpp/references/troubleshooting.md`)
+## Library Health Score
 
-### Cluster 3 (average similarity 0.98)
-- webhooks (`autonomous-ai-agents/hermes-agent/references/webhooks.md`)
-- webhook-subscriptions (`devops/webhook-subscriptions/SKILL.md`)
+**Overall Health: 68 / 100**
 
-### Cluster 4 (average similarity 0.98)
-- native-mcp (`autonomous-ai-agents/hermes-agent/references/native-mcp.md`)
-- native-mcp (`mcp/native-mcp/SKILL.md`)
+- **Structure**: 21 / 25
+- **Maintainability**: 13 / 25
+- **Reusability**: 22 / 25
+- **Duplication**: 12 / 25
 
-### Cluster 5 (average similarity 0.93)
-- wavespeed (`creative/wavespeed/SKILL.md`)
-- wavespeed (`wavespeed/SKILL.md`)
+## Governance Summary
 
-### Cluster 6 (average similarity 0.84)
-- llama-cpp (`mlops/inference/llama-cpp/SKILL.md`)
-- hub-discovery (`mlops/inference/llama-cpp/references/hub-discovery.md`)
+• Health score is below recommended level.
+• Only 5.7% of installed skills have been used.
+• 66 skills have never been used.
+• Several large unused packages represent maintenance overhead.
+• Duplicate package risk remains low.
 
-### Cluster 7 (average similarity 0.83)
-- expo (`creative/popular-web-designs/templates/expo.md`)
-- ollama (`creative/popular-web-designs/templates/ollama.md`)
+## Runtime Governance
 
-### Cluster 8 (average similarity 0.83)
-- elevenlabs (`creative/popular-web-designs/templates/elevenlabs.md`)
-- notion (`creative/popular-web-designs/templates/notion.md`)
+### Most Used Skills
 
-### Cluster 9 (average similarity 0.83)
-- cursor (`creative/popular-web-designs/templates/cursor.md`)
-- zapier (`creative/popular-web-designs/templates/zapier.md`)
+| Skill | Uses | Views | Last Used |
+| ----- | ---: | ----: | --------- |
+| `governance/skill-health-check` | 3 | 3 | 2026-06-23 |
+| `creative/wavespeed` | 2 | 2 | 2026-06-17 |
+| `dogfood` | 2 | 2 | 2026-06-12 |
+| `autonomous-ai-agents/hermes-agent` | 1 | 1 | 2026-06-22 |
 
-### Cluster 10 (average similarity 0.81)
-- cohere (`creative/popular-web-designs/templates/cohere.md`)
-- sentry (`creative/popular-web-designs/templates/sentry.md`)
-- superhuman (`creative/popular-web-designs/templates/superhuman.md`)
-- uber (`creative/popular-web-designs/templates/uber.md`)
+### Recently Used Skills
 
+| Skill | Last Used |
+| ----- | --------- |
+| `governance/skill-health-check` | 2026-06-23 |
+| `autonomous-ai-agents/hermes-agent` | 2026-06-22 |
+| `creative/wavespeed` | 2026-06-17 |
+| `dogfood` | 2026-06-12 |
 
-## Governance Findings
+### Never Used Skills
 
-- Duplicate or overlapping assets detected (10 clusters)
-- Skill inflation detected
+66 skills have never been used.
 
-## Recommendations
+| Skill | Category |
+| ----- | -------- |
+| `apple/apple-notes` | apple |
+| `apple/apple-reminders` | apple |
+| `apple/findmy` | apple |
+| `apple/imessage` | apple |
+| `apple/macos-computer-use` | apple |
+| `autonomous-ai-agents/claude-code` | autonomous-ai-agents |
+| `autonomous-ai-agents/codex` | autonomous-ai-agents |
+| `autonomous-ai-agents/opencode` | autonomous-ai-agents |
+| `creative/architecture-diagram` | creative |
+| `creative/ascii-art` | creative |
+| `creative/ascii-video` | creative |
+| `creative/baoyu-infographic` | creative |
+| `creative/claude-design` | creative |
+| `creative/comfyui` | creative |
+| `creative/design-md` | creative |
+| `creative/excalidraw` | creative |
+| `creative/humanizer` | creative |
+| `creative/manim-video` | creative |
+| `creative/p5js` | creative |
+| `creative/popular-web-designs` | creative |
 
-- Review low-confidence classifications and reclassify assets where needed
-- Merge or archive highly overlapping assets in duplicate clusters
+### Category Utilization
+
+| Category | Utilization | Used / Total |
+| -------- | ----------: | ------------ |
+| dogfood | 100% | 1 / 1 |
+| governance | 100% | 1 / 1 |
+| autonomous-ai-agents | 25% | 1 / 4 |
+| creative | 6% | 1 / 17 |
+| apple | 0% | 0 / 5 |
+| data-science | 0% | 0 / 1 |
+| devops | 0% | 0 / 2 |
+| email | 0% | 0 / 1 |
+| github | 0% | 0 / 6 |
+| media | 0% | 0 / 4 |
+| mlops | 0% | 0 / 1 |
+| note-taking | 0% | 0 / 1 |
+| productivity | 0% | 0 / 8 |
+| red-teaming | 0% | 0 / 1 |
+| research | 0% | 0 / 5 |
+| smart-home | 0% | 0 / 1 |
+| social-media | 0% | 0 / 1 |
+| software-development | 0% | 0 / 9 |
+| yuanbao | 0% | 0 / 1 |
+
+## Governance Recommendations
+
+### Split monolithic package
+- **Scope**: `creative/popular-web-designs`
+- **Severity**: Critical
+- **Description**: `creative/popular-web-designs` has complexity 108 with 54 templates, 0 references, 0 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Split monolithic package
+- **Scope**: `productivity/powerpoint`
+- **Severity**: Critical
+- **Description**: `productivity/powerpoint` has complexity 135 with 0 templates, 0 references, 44 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Move references into dedicated knowledge package
+- **Scope**: `creative/baoyu-infographic`
+- **Severity**: High
+- **Description**: `creative/baoyu-infographic` has 45 reference files.
+- **Action**: Extract reference materials into a separate knowledge-base package to reduce the main skill's complexity.
+
+### Split monolithic package
+- **Scope**: `creative/comfyui`
+- **Severity**: High
+- **Description**: `creative/comfyui` has complexity 54 with 0 templates, 4 references, 11 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Split template library into dedicated package
+- **Scope**: `creative/popular-web-designs`
+- **Severity**: High
+- **Description**: `creative/popular-web-designs` has 54 template files.
+- **Action**: Create a dedicated template-library package and move templates there. The main skill should reference the library rather than contain all templates.
+
+### Move references into dedicated knowledge package
+- **Scope**: `creative/touchdesigner-mcp`
+- **Severity**: High
+- **Description**: `creative/touchdesigner-mcp` has 21 reference files.
+- **Action**: Extract reference materials into a separate knowledge-base package to reduce the main skill's complexity.
+
+### Split monolithic package
+- **Scope**: `research/research-paper-writing`
+- **Severity**: High
+- **Description**: `research/research-paper-writing` has complexity 99 with 45 templates, 9 references, 0 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Split template library into dedicated package
+- **Scope**: `research/research-paper-writing`
+- **Severity**: High
+- **Description**: `research/research-paper-writing` has 45 template files.
+- **Action**: Create a dedicated template-library package and move templates there. The main skill should reference the library rather than contain all templates.
+
+### Review unused skills for archival
+- **Scope**: `[library-wide]`
+- **Severity**: High
+- **Description**: Only 5.7% of installed skills are actively used. 66 skills have never been used.
+- **Action**: Consider archiving or removing unused skills. Review large unused packages before adding new skills.
+
+### Skill utilization is below 10%
+- **Scope**: `[library-wide]`
+- **Severity**: High
+- **Description**: Only 5.7% of installed skills are actively used. Large portions of the library may no longer provide value.
+- **Action**: Review the unused skills list and consider removing or archiving skills that are no longer relevant to your workflow.
+
+### Split monolithic package
+- **Scope**: `creative/baoyu-infographic`
+- **Severity**: Medium
+- **Description**: `creative/baoyu-infographic` has complexity 46 with 0 templates, 45 references, 0 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Modularize scripts
+- **Scope**: `creative/comfyui`
+- **Severity**: Medium
+- **Description**: `creative/comfyui` has 11 script files.
+- **Action**: Group related scripts into sub-packages or a scripts library. Consider whether all scripts serve a single executable purpose.
+
+### Split monolithic package
+- **Scope**: `creative/p5js`
+- **Severity**: Medium
+- **Description**: `creative/p5js` has complexity 25 with 1 templates, 10 references, 4 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Split monolithic package
+- **Scope**: `creative/touchdesigner-mcp`
+- **Severity**: Medium
+- **Description**: `creative/touchdesigner-mcp` has complexity 24 with 0 templates, 21 references, 1 scripts.
+- **Action**: Consider splitting into smaller focused packages. Move templates/references into a dedicated knowledge package. Keep executable scripts in the core skill.
+
+### Modularize scripts
+- **Scope**: `productivity/powerpoint`
+- **Severity**: Medium
+- **Description**: `productivity/powerpoint` has 44 script files.
+- **Action**: Group related scripts into sub-packages or a scripts library. Consider whether all scripts serve a single executable purpose.
+
+### Convert to executable skill
+- **Scope**: `mlops/huggingface-hub`
+- **Severity**: Low
+- **Description**: `mlops/huggingface-hub` is classified as Reference Material with low complexity.
+- **Action**: Define clear inputs, outputs, and procedures to make this an executable skill.
+
+### Convert to executable skill
+- **Scope**: `productivity/airtable`
+- **Severity**: Low
+- **Description**: `productivity/airtable` is classified as Reference Material with low complexity.
+- **Action**: Define clear inputs, outputs, and procedures to make this an executable skill.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `devops` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `dogfood` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `governance` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `red-teaming` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `software-development` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+### Add category description
+- **Scope**: `[library-wide]`
+- **Severity**: Low
+- **Description**: `yuanbao` has no DESCRIPTION.md.
+- **Action**: Create a DESCRIPTION.md explaining the category's purpose and scope.
+
+## Highest Risk Packages
+
+| Rank | Package | Category | Health | Complexity | Risk Factors |
+|---:|---|---|---:|---:|---|
+| 1 | `creative/popular-web-designs` | creative | 46 / 100 | 108 | High complexity (108); Template bloat (54 templates) |
+| 2 | `research/research-paper-writing` | research | 60 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
+| 3 | `productivity/powerpoint` | productivity | 62 / 100 | 135 | High complexity (135); Script bloat (44 scripts) |
+| 4 | `creative/comfyui` | creative | 71 / 100 | 54 | High complexity (54); Script bloat (11 scripts) |
+| 5 | `creative/baoyu-infographic` | creative | 75 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
+| 6 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
+| 7 | `creative/p5js` | creative | 90 / 100 | 25 | High complexity (25) |
+| 8 | `mlops/huggingface-hub` | mlops | 91 / 100 | 0 | - |
+| 9 | `productivity/airtable` | productivity | 91 / 100 | 0 | - |
+| 10 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
+
+## Unused High-Cost Skills
+
+| Skill | Category | Complexity | References | Templates | Scripts |
+| ----- | -------- | ----------: | ----------: | ---------: | --------: |
+| `productivity/powerpoint` | productivity | 135 | 0 | 0 | 44 |
+| `creative/popular-web-designs` | creative | 108 | 0 | 54 | 0 |
+| `research/research-paper-writing` | research | 99 | 9 | 45 | 0 |
+| `creative/comfyui` | creative | 54 | 4 | 0 | 11 |
+| `creative/baoyu-infographic` | creative | 46 | 45 | 0 | 0 |
+| `creative/p5js` | creative | 25 | 10 | 1 | 4 |
+| `creative/touchdesigner-mcp` | creative | 24 | 21 | 0 | 1 |
+| `creative/manim-video` | creative | 18 | 14 | 0 | 1 |
+| `red-teaming/godmode` | red-teaming | 18 | 2 | 2 | 4 |
+| `productivity/google-workspace` | productivity | 13 | 1 | 0 | 4 |
+
+## Most Valuable Packages
+
+| Rank | Package | Category | Health | Value Score |
+|---:|---|---|---:|---:|
+| 1 | `creative/baoyu-infographic` | creative | 75 / 100 | 129 |
+| 2 | `research/research-paper-writing` | research | 60 / 100 | 120 |
+| 3 | `productivity/powerpoint` | productivity | 62 / 100 | 118 |
+| 4 | `creative/comfyui` | creative | 71 / 100 | 97 |
+| 5 | `creative/popular-web-designs` | creative | 46 / 100 | 86 |
+| 6 | `creative/p5js` | creative | 90 / 100 | 79 |
+| 7 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 79 |
+| 8 | `creative/manim-video` | creative | 93 / 100 | 75 |
+| 9 | `red-teaming/godmode` | red-teaming | 98 / 100 | 64 |
+| 10 | `creative/ascii-video` | creative | 99 / 100 | 58 |
+
+---
+
+## Package Type Distribution
+
+- **Knowledge**: 5 (7%)
+- **Workflow**: 9 (13%)
+- **Executable Skill**: 53 (76%)
+- **Reference Material**: 3 (4%)
+
+## Asset Distribution
+
+- **References**: 131
+- **Templates**: 111
+- **Scripts**: 77
+- **Assets**: 26
+
+## Category Breakdown
+
+### apple
+*Apple / macOS skills — tools that interact with the Mac desktop (Finder,
+native apps) or system features (accessibility, screenshots).*
+- **5** skill packages
+  - Executable Skill: 5
+### autonomous-ai-agents
+*---
+description: Skills for spawning and orchestrating autonomous AI coding agents and multi-agent workflows — running independent agent processes, delegating tasks, and coordinating parallel workstre*
+- **4** skill packages
+  - Knowledge: 1
+  - Executable Skill: 3
+### creative
+*---
+description: Creative content generation — ASCII art, hand-drawn style diagrams, and visual design tools.
+---*
+- **17** skill packages
+  - Knowledge: 2
+  - Workflow: 1
+  - Executable Skill: 13
+  - Reference Material: 1
+### data-science
+*---
+description: Skills for data science workflows — interactive exploration, Jupyter notebooks, data analysis, and visualization.
+---*
+- **1** skill packages
+  - Executable Skill: 1
+### devops
+- **2** skill packages
+  - Knowledge: 1
+  - Workflow: 1
+### dogfood
+- **1** skill packages
+  - Workflow: 1
+### email
+*---
+description: Skills for sending, receiving, searching, and managing email from the terminal.
+---*
+- **1** skill packages
+  - Executable Skill: 1
+### github
+*---
+description: GitHub workflow skills for managing repositories, pull requests, code reviews, issues, and CI/CD pipelines using the gh CLI and git via terminal.
+---*
+- **6** skill packages
+  - Workflow: 1
+  - Executable Skill: 5
+### governance
+- **1** skill packages
+  - Executable Skill: 1
+### media
+*---
+description: Skills for working with media content — YouTube transcripts, GIF search, music generation, and audio visualization.
+---*
+- **4** skill packages
+  - Executable Skill: 4
+### mlops
+*---
+description: Knowledge and Tools for Machine Learning Operations - tools and frameworks for training, fine-tuning, deploying, and optimizing ML/AI models
+---*
+- **1** skill packages
+  - Reference Material: 1
+### note-taking
+*---
+description: Note taking skills, to save information, assist with research, and collab on multi-session planning and information sharing.
+---*
+- **1** skill packages
+  - Workflow: 1
+### productivity
+*---
+description: Skills for document creation, presentations, spreadsheets, and other productivity workflows.
+---*
+- **8** skill packages
+  - Executable Skill: 7
+  - Reference Material: 1
+### red-teaming
+- **1** skill packages
+  - Executable Skill: 1
+### research
+*---
+description: Skills for academic research, paper discovery, literature review, domain reconnaissance, market data, content monitoring, and scientific knowledge retrieval.
+---*
+- **5** skill packages
+  - Workflow: 2
+  - Executable Skill: 3
+### smart-home
+*---
+description: Skills for controlling smart home devices — lights, switches, sensors, and home automation systems.
+---*
+- **1** skill packages
+  - Executable Skill: 1
+### social-media
+*---
+description: Skills for interacting with social platforms and social-media workflows — posting, reading, monitoring, and account operations.
+---*
+- **1** skill packages
+  - Executable Skill: 1
+### software-development
+- **9** skill packages
+  - Knowledge: 1
+  - Workflow: 2
+  - Executable Skill: 6
+### yuanbao
+- **1** skill packages
+  - Executable Skill: 1
+
+## Duplicate Skill Packages
+
+No duplicate skill packages detected.
