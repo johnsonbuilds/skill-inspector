@@ -19,11 +19,11 @@ Utilization Rate: 5.7%
 
 ## Library Health Score
 
-**Overall Health: 67 / 100**
+**Overall Health: 68 / 100**
 
 - **Structure**: 21 / 25
 - **Maintainability**: 13 / 25
-- **Reusability**: 21 / 25
+- **Reusability**: 22 / 25
 - **Duplication**: 12 / 25
 
 ## Governance Summary
@@ -31,8 +31,8 @@ Utilization Rate: 5.7%
 • Only 5.7% of installed skills have ever been executed.
 • 66 skills have never been executed.
 • `productivity/powerpoint` is the largest unused package by complexity (135).
-• `creative/popular-web-designs` has the lowest health score at 46 / 100.
-• Library health is below target at 67 / 100.
+• `creative/popular-web-designs` has the lowest health score at 56 / 100.
+• Library health is below target at 68 / 100.
 
 ## Runtime Governance
 
@@ -56,35 +56,7 @@ Skills executed within the last 3 days.
 | `governance/skill-health-check` | 2026-06-23 |
 | `autonomous-ai-agents/hermes-agent` | 2026-06-22 |
 
-### Never Used Skills
-
-66 skills remain completely unused. The table shows the 10 most complex.
-
-| Skill | Category | Complexity |
-| ----- | -------- | ----------: |
-| `productivity/powerpoint` | productivity | 135 |
-| `creative/popular-web-designs` | creative | 108 |
-| `research/research-paper-writing` | research | 99 |
-| `creative/comfyui` | creative | 54 |
-| `creative/baoyu-infographic` | creative | 46 |
-| `creative/p5js` | creative | 25 |
-| `creative/touchdesigner-mcp` | creative | 24 |
-| `creative/manim-video` | creative | 18 |
-| `red-teaming/godmode` | red-teaming | 18 |
-| `productivity/google-workspace` | productivity | 13 |
-
-### Category Utilization
-
-15 categories have 0% utilization and are collapsed from the table.
-
-| Category | Utilization | Used / Total |
-| -------- | ----------: | ------------ |
-| dogfood | 100% | 1 / 1 |
-| governance | 100% | 1 / 1 |
-| autonomous-ai-agents | 25% | 1 / 4 |
-| creative | 6% | 1 / 17 |
-
-## Unused High-Cost Skills
+### Unused High-Cost Skills
 
 66 installed skills have no recorded executions. The table shows the top 10 by complexity.
 
@@ -101,13 +73,24 @@ Skills executed within the last 3 days.
 | `red-teaming/godmode` | red-teaming | 18 | 2 | 2 | 4 |
 | `productivity/google-workspace` | productivity | 13 | 1 | 0 | 4 |
 
+### Category Utilization
+
+15 categories have 0% utilization and are collapsed from the table.
+
+| Category | Utilization | Used / Total |
+| -------- | ----------: | ------------ |
+| dogfood | 100% | 1 / 1 |
+| governance | 100% | 1 / 1 |
+| autonomous-ai-agents | 25% | 1 / 4 |
+| creative | 6% | 1 / 17 |
+
 ## Cleanup Priorities
 
 If you only clean up a few packages first, start with the highest-scoring unused packages below.
 
 | Rank | Package | Priority Score | Reason |
 | ----: | ------- | -------------: | ------ |
-| 1 | `creative/popular-web-designs` | 110 | Unused + Complexity 108 + Health 46 + 2 risk signals |
+| 1 | `creative/popular-web-designs` | 110 | Unused + Complexity 108 + Health 56 + 2 risk signals |
 | 2 | `productivity/powerpoint` | 95 | Unused + Complexity 135 + 2 risk signals |
 | 3 | `research/research-paper-writing` | 85 | Unused + Complexity 99 + 2 risk signals |
 | 4 | `creative/comfyui` | 85 | Unused + Complexity 54 + 2 risk signals |
@@ -183,46 +166,45 @@ If you only clean up a few packages first, start with the highest-scoring unused
 Additional Recommendations Hidden
 
 - Medium: 5
-- Low: 7
+- Low: 6
 
 ## Highest Risk Packages
 
 | Rank | Package | Category | Health | Complexity | Risk Factors |
 |---:|---|---|---:|---:|---|
-| 1 | `creative/popular-web-designs` | creative | 46 / 100 | 108 | High complexity (108); Template bloat (54 templates) |
-| 2 | `research/research-paper-writing` | research | 60 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
+| 1 | `creative/popular-web-designs` | creative | 56 / 100 | 108 | High complexity (108); Template bloat (54 templates) |
+| 2 | `research/research-paper-writing` | research | 61 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
 | 3 | `productivity/powerpoint` | productivity | 62 / 100 | 135 | High complexity (135); Script bloat (44 scripts) |
 | 4 | `creative/comfyui` | creative | 71 / 100 | 54 | High complexity (54); Script bloat (11 scripts) |
-| 5 | `creative/touchdesigner-mcp` | creative | 72 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
-| 6 | `creative/baoyu-infographic` | creative | 73 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
+| 5 | `creative/baoyu-infographic` | creative | 73 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
+| 6 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
 | 7 | `creative/p5js` | creative | 90 / 100 | 25 | High complexity (25) |
-| 8 | `mlops/huggingface-hub` | mlops | 91 / 100 | 0 | - |
-| 9 | `creative/humanizer` | creative | 93 / 100 | 1 | - |
-| 10 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
+| 8 | `creative/humanizer` | creative | 93 / 100 | 1 | - |
+| 9 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
+| 10 | `creative/songwriting-and-ai-music` | creative | 93 / 100 | 0 | - |
 
 ## Most Valuable Packages
 
 | Rank | Package | Category | Health | Value Score | Drivers |
 |---:|---|---|---:|---:|---|
-| 1 | `research/research-paper-writing` | research | 60 / 100 | 120 | 9 references, high template density, workflow |
-| 2 | `productivity/powerpoint` | productivity | 62 / 100 | 118 | script-heavy, executable skill |
-| 3 | `creative/baoyu-infographic` | creative | 73 / 100 | 117 | 45 references, workflow, good health |
-| 4 | `creative/comfyui` | creative | 71 / 100 | 97 | 4 references, script-heavy, executable skill, good health |
-| 5 | `creative/popular-web-designs` | creative | 46 / 100 | 86 | high template density, health penalty |
+| 1 | `research/research-paper-writing` | research | 61 / 100 | 131 | 9 references, high template density, executable skill |
+| 2 | `creative/popular-web-designs` | creative | 56 / 100 | 126 | high template density, executable skill |
+| 3 | `productivity/powerpoint` | productivity | 62 / 100 | 118 | script-heavy, executable skill |
+| 4 | `creative/baoyu-infographic` | creative | 73 / 100 | 117 | 45 references, workflow, good health |
+| 5 | `creative/comfyui` | creative | 71 / 100 | 97 | 4 references, script-heavy, executable skill, good health |
 | 6 | `creative/p5js` | creative | 90 / 100 | 79 | 10 references, 1 templates, executable skill, good health |
-| 7 | `creative/manim-video` | creative | 93 / 100 | 75 | 14 references, executable skill, good health |
-| 8 | `red-teaming/godmode` | red-teaming | 98 / 100 | 64 | 2 references, 2 templates, executable skill, good health |
-| 9 | `productivity/google-workspace` | productivity | 98 / 100 | 53 | 1 references, executable skill, good health |
-| 10 | `creative/ascii-video` | creative | 97 / 100 | 46 | 8 references, workflow, good health |
+| 7 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 79 | 21 references, executable skill, good health |
+| 8 | `creative/manim-video` | creative | 93 / 100 | 75 | 14 references, executable skill, good health |
+| 9 | `red-teaming/godmode` | red-teaming | 98 / 100 | 64 | 2 references, 2 templates, executable skill, good health |
+| 10 | `productivity/google-workspace` | productivity | 98 / 100 | 53 | 1 references, executable skill, good health |
 
 ---
 
 ## Package Type Distribution
 
-- **Knowledge**: 8 (11%)
-- **Workflow**: 15 (21%)
-- **Executable Skill**: 45 (64%)
-- **Reference Material**: 2 (3%)
+- **Knowledge**: 7 (10%)
+- **Workflow**: 11 (16%)
+- **Executable Skill**: 52 (74%)
 
 ## Asset Distribution
 
@@ -249,10 +231,9 @@ description: Skills for spawning and orchestrating autonomous AI coding agents a
 description: Creative content generation — ASCII art, hand-drawn style diagrams, and visual design tools.
 ---*
 - **17** skill packages
-  - Knowledge: 4
-  - Workflow: 4
-  - Executable Skill: 8
-  - Reference Material: 1
+  - Knowledge: 2
+  - Workflow: 3
+  - Executable Skill: 12
 ### data-science
 *---
 description: Skills for data science workflows — interactive exploration, Jupyter notebooks, data analysis, and visualization.
@@ -277,8 +258,8 @@ description: Skills for sending, receiving, searching, and managing email from t
 description: GitHub workflow skills for managing repositories, pull requests, code reviews, issues, and CI/CD pipelines using the gh CLI and git via terminal.
 ---*
 - **6** skill packages
-  - Workflow: 2
-  - Executable Skill: 4
+  - Workflow: 1
+  - Executable Skill: 5
 ### governance
 - **1** skill packages
   - Executable Skill: 1
@@ -294,13 +275,13 @@ description: Skills for working with media content — YouTube transcripts, GIF 
 description: Knowledge and Tools for Machine Learning Operations - tools and frameworks for training, fine-tuning, deploying, and optimizing ML/AI models
 ---*
 - **1** skill packages
-  - Reference Material: 1
+  - Executable Skill: 1
 ### note-taking
 *---
 description: Note taking skills, to save information, assist with research, and collab on multi-session planning and information sharing.
 ---*
 - **1** skill packages
-  - Knowledge: 1
+  - Workflow: 1
 ### productivity
 *---
 description: Skills for document creation, presentations, spreadsheets, and other productivity workflows.
@@ -315,8 +296,7 @@ description: Skills for document creation, presentations, spreadsheets, and othe
 description: Skills for academic research, paper discovery, literature review, domain reconnaissance, market data, content monitoring, and scientific knowledge retrieval.
 ---*
 - **5** skill packages
-  - Workflow: 2
-  - Executable Skill: 3
+  - Executable Skill: 5
 ### smart-home
 *---
 description: Skills for controlling smart home devices — lights, switches, sensors, and home automation systems.
@@ -331,9 +311,9 @@ description: Skills for interacting with social platforms and social-media workf
   - Executable Skill: 1
 ### software-development
 - **9** skill packages
-  - Knowledge: 1
-  - Workflow: 4
-  - Executable Skill: 4
+  - Knowledge: 3
+  - Workflow: 3
+  - Executable Skill: 3
 ### yuanbao
 - **1** skill packages
   - Executable Skill: 1
