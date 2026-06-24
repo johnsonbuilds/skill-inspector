@@ -19,20 +19,24 @@ Utilization Rate: 5.7%
 
 ## Library Health Score
 
-**Overall Health: 68 / 100**
+**Overall Health: 67 / 100**
 
 - **Structure**: 21 / 25
 - **Maintainability**: 13 / 25
-- **Reusability**: 22 / 25
+- **Reusability**: 21 / 25
 - **Duplication**: 12 / 25
 
 ## Governance Summary
 
 • Only 5.7% of installed skills have ever been executed.
+
 • 66 skills have never been executed.
+
 • `productivity/powerpoint` is the largest unused package by complexity (135).
-• `creative/popular-web-designs` has the lowest health score at 56 / 100.
-• Library health is below target at 68 / 100.
+
+• `creative/popular-web-designs` has the lowest health score at 48 / 100.
+
+• Library health is below target at 67 / 100.
 
 ## Runtime Governance
 
@@ -42,7 +46,7 @@ Only 4 of 70 installed skills have ever been executed.
 
 | Skill | Uses | Views | Last Used |
 | ----- | ---: | ----: | --------- |
-| `governance/skill-health-check` | 3 | 3 | 2026-06-23 |
+| `governance/skill-health-check` | 5 | 5 | 2026-06-24 |
 | `creative/wavespeed` | 2 | 2 | 2026-06-17 |
 | `dogfood` | 2 | 2 | 2026-06-12 |
 | `autonomous-ai-agents/hermes-agent` | 1 | 1 | 2026-06-22 |
@@ -53,7 +57,7 @@ Skills executed within the last 3 days.
 
 | Skill | Last Used |
 | ----- | --------- |
-| `governance/skill-health-check` | 2026-06-23 |
+| `governance/skill-health-check` | 2026-06-24 |
 | `autonomous-ai-agents/hermes-agent` | 2026-06-22 |
 
 ### Unused High-Cost Skills
@@ -90,7 +94,7 @@ If you only clean up a few packages first, start with the highest-scoring unused
 
 | Rank | Package | Priority Score | Reason |
 | ----: | ------- | -------------: | ------ |
-| 1 | `creative/popular-web-designs` | 110 | Unused + Complexity 108 + Health 56 + 2 risk signals |
+| 1 | `creative/popular-web-designs` | 110 | Unused + Complexity 108 + Health 48 + 2 risk signals |
 | 2 | `productivity/powerpoint` | 95 | Unused + Complexity 135 + 2 risk signals |
 | 3 | `research/research-paper-writing` | 85 | Unused + Complexity 99 + 2 risk signals |
 | 4 | `creative/comfyui` | 85 | Unused + Complexity 54 + 2 risk signals |
@@ -166,32 +170,32 @@ If you only clean up a few packages first, start with the highest-scoring unused
 Additional Recommendations Hidden
 
 - Medium: 5
-- Low: 6
+- Low: 7
 
 ## Highest Risk Packages
 
 | Rank | Package | Category | Health | Complexity | Risk Factors |
 |---:|---|---|---:|---:|---|
-| 1 | `creative/popular-web-designs` | creative | 56 / 100 | 108 | High complexity (108); Template bloat (54 templates) |
-| 2 | `research/research-paper-writing` | research | 61 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
+| 1 | `creative/popular-web-designs` | creative | 48 / 100 | 108 | High complexity (108); Template bloat (54 templates) |
+| 2 | `research/research-paper-writing` | research | 60 / 100 | 99 | High complexity (99); Template bloat (45 templates) |
 | 3 | `productivity/powerpoint` | productivity | 62 / 100 | 135 | High complexity (135); Script bloat (44 scripts) |
 | 4 | `creative/comfyui` | creative | 71 / 100 | 54 | High complexity (54); Script bloat (11 scripts) |
 | 5 | `creative/baoyu-infographic` | creative | 73 / 100 | 46 | High complexity (46); Reference bloat (45 references) |
 | 6 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 24 | High complexity (24); Reference bloat (21 references) |
 | 7 | `creative/p5js` | creative | 90 / 100 | 25 | High complexity (25) |
-| 8 | `creative/humanizer` | creative | 93 / 100 | 1 | - |
-| 9 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
-| 10 | `creative/songwriting-and-ai-music` | creative | 93 / 100 | 0 | - |
+| 8 | `mlops/huggingface-hub` | mlops | 91 / 100 | 0 | - |
+| 9 | `creative/humanizer` | creative | 93 / 100 | 1 | - |
+| 10 | `creative/manim-video` | creative | 93 / 100 | 18 | - |
 
 ## Most Valuable Packages
 
 | Rank | Package | Category | Health | Value Score | Drivers |
 |---:|---|---|---:|---:|---|
-| 1 | `research/research-paper-writing` | research | 61 / 100 | 131 | 9 references, high template density, executable skill |
-| 2 | `creative/popular-web-designs` | creative | 56 / 100 | 126 | high template density, executable skill |
-| 3 | `productivity/powerpoint` | productivity | 62 / 100 | 118 | script-heavy, executable skill |
-| 4 | `creative/baoyu-infographic` | creative | 73 / 100 | 117 | 45 references, workflow, good health |
-| 5 | `creative/comfyui` | creative | 71 / 100 | 97 | 4 references, script-heavy, executable skill, good health |
+| 1 | `research/research-paper-writing` | research | 60 / 100 | 120 | 9 references, high template density, workflow |
+| 2 | `productivity/powerpoint` | productivity | 62 / 100 | 118 | script-heavy, executable skill |
+| 3 | `creative/baoyu-infographic` | creative | 73 / 100 | 117 | 45 references, workflow, good health |
+| 4 | `creative/comfyui` | creative | 71 / 100 | 97 | 4 references, script-heavy, executable skill, good health |
+| 5 | `creative/popular-web-designs` | creative | 48 / 100 | 88 | high template density, health penalty |
 | 6 | `creative/p5js` | creative | 90 / 100 | 79 | 10 references, 1 templates, executable skill, good health |
 | 7 | `creative/touchdesigner-mcp` | creative | 79 / 100 | 79 | 21 references, executable skill, good health |
 | 8 | `creative/manim-video` | creative | 93 / 100 | 75 | 14 references, executable skill, good health |
@@ -202,9 +206,10 @@ Additional Recommendations Hidden
 
 ## Package Type Distribution
 
-- **Knowledge**: 7 (10%)
-- **Workflow**: 11 (16%)
-- **Executable Skill**: 52 (74%)
+- **Knowledge**: 9 (13%)
+- **Workflow**: 15 (21%)
+- **Executable Skill**: 45 (64%)
+- **Reference Material**: 1 (1%)
 
 ## Asset Distribution
 
@@ -231,9 +236,9 @@ description: Skills for spawning and orchestrating autonomous AI coding agents a
 description: Creative content generation — ASCII art, hand-drawn style diagrams, and visual design tools.
 ---*
 - **17** skill packages
-  - Knowledge: 2
-  - Workflow: 3
-  - Executable Skill: 12
+  - Knowledge: 4
+  - Workflow: 4
+  - Executable Skill: 9
 ### data-science
 *---
 description: Skills for data science workflows — interactive exploration, Jupyter notebooks, data analysis, and visualization.
@@ -275,7 +280,7 @@ description: Skills for working with media content — YouTube transcripts, GIF 
 description: Knowledge and Tools for Machine Learning Operations - tools and frameworks for training, fine-tuning, deploying, and optimizing ML/AI models
 ---*
 - **1** skill packages
-  - Executable Skill: 1
+  - Reference Material: 1
 ### note-taking
 *---
 description: Note taking skills, to save information, assist with research, and collab on multi-session planning and information sharing.
@@ -287,7 +292,8 @@ description: Note taking skills, to save information, assist with research, and 
 description: Skills for document creation, presentations, spreadsheets, and other productivity workflows.
 ---*
 - **8** skill packages
-  - Executable Skill: 8
+  - Workflow: 2
+  - Executable Skill: 6
 ### red-teaming
 - **1** skill packages
   - Executable Skill: 1
@@ -296,7 +302,8 @@ description: Skills for document creation, presentations, spreadsheets, and othe
 description: Skills for academic research, paper discovery, literature review, domain reconnaissance, market data, content monitoring, and scientific knowledge retrieval.
 ---*
 - **5** skill packages
-  - Executable Skill: 5
+  - Workflow: 1
+  - Executable Skill: 4
 ### smart-home
 *---
 description: Skills for controlling smart home devices — lights, switches, sensors, and home automation systems.
