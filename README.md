@@ -97,13 +97,13 @@ Improve executable skill coverage
 
 ![Overview](docs/report-overview.png)
 
-### Risk Analysis
+### Runtime Governance
 
-![Risk Analysis](docs/report-risks.png)
+![Runtime Governance](docs/runtime_governance.png)
 
-### Governance Recommendations
+### Unused High-Cost Skills
 
-![Governance Recommendations](docs/report-recommendations.png)
+![Unused High-Cost Skills](docs/unused_skills.png)
 
 ---
 
