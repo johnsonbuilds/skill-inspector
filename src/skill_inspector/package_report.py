@@ -378,7 +378,10 @@ class PackageReportGenerator:
         )
 
         findings: list[tuple[int, str]] = []
-        findings.append((100, f"• Only {usage.utilization_rate}% of installed skills have ever been executed."))
+        if usage.utilization_rate < 10:
+            findings.append((100, f"• Only {usage.utilization_rate}% of installed skills have ever been executed."))
+        else:
+            findings.append((100, f"• {usage.utilization_rate}% of installed skills have ever been executed."))
         findings.append((95, f"• {usage.unused_skills} skills have never been executed."))
 
         unused_pkgs = [pkg for cat in categories for pkg in cat.packages if not is_package_used(matched_usage.get(pkg.id))]
@@ -406,8 +409,8 @@ class PackageReportGenerator:
 
         for _, finding in sorted(findings, key=lambda item: item[0], reverse=True)[:5]:
             lines.append(finding)
-
-        lines.append("")
+            lines.append("")
+        
         return lines
 
     def _build_utilization_summary(self, usage: UsageAnalysis) -> list[str]:
@@ -459,7 +462,10 @@ class PackageReportGenerator:
 
         lines.append("### Most Used Skills")
         lines.append("")
-        lines.append(f"Only {usage.used_skills} of {usage.installed_skills} installed skills have ever been executed.")
+        if usage.utilization_rate < 10:
+            lines.append(f"Only {usage.used_skills} of {usage.installed_skills} installed skills have ever been executed.")
+        else:
+            lines.append(f"{usage.used_skills} of {usage.installed_skills} installed skills have ever been executed.")
         lines.append("")
         lines.append("| Skill | Uses | Views | Last Used |")
         lines.append("| ----- | ---: | ----: | --------- |")
@@ -662,7 +668,7 @@ def _generate_utilization_recommendations(
             severity="Medium" if usage.unused_skills < 50 else "High",
             title="Review unused skills for archival",
             description=(
-                f"Only {usage.utilization_rate}% of installed skills are actively used. "
+                f"{'Only ' if usage.utilization_rate < 10 else ''}{usage.utilization_rate}% of installed skills are actively used. "
                 f"{usage.unused_skills} skills have never been used."
             ),
             action="Consider archiving or removing unused skills. Review large unused packages before adding new skills.",
@@ -675,7 +681,7 @@ def _generate_utilization_recommendations(
             severity="High",
             title="Skill utilization is below 10%",
             description=(
-                f"Only {usage.utilization_rate}% of installed skills are actively used. "
+                f"{'Only ' if usage.utilization_rate < 10 else ''}{usage.utilization_rate}% of installed skills are actively used. "
                 f"Large portions of the library may no longer provide value."
             ),
             action="Review the unused skills list and consider removing or archiving "
